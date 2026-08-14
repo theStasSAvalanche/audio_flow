@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show initLogger, logger;
-import 'package:audio_flow/src/configuration/config.dart' show settings;
+import 'package:audio_flow/src/configuration/config.dart' show Settings;
 import 'package:audio_flow/src/ui/basic_material_app.dart' show AudioFlowApp;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await settings.initSettings();
+  await Settings.initSettings();
   await initLogger();
-  logger.log.i('Application started');
-  logger.logNS.i('Let\'s go!!!');
+  logger.log.d('Application started');
+  logger.logNS.d('Let\'s go!!!');
   runApp(const AudioFlowApp());
 }

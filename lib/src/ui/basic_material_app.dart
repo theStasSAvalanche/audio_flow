@@ -28,7 +28,7 @@ class AudioFlowMaterial extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    logger.log.i('Start building MaterialApp widget');
+    logger.log.d('Start building MaterialApp widget');
     final themeBloc = ThemeBloc();
 
     return MultiBlocProvider(

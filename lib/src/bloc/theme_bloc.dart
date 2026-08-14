@@ -7,6 +7,7 @@ import 'package:audio_flow/src/configuration/config.dart' show settings;
 class ThemeBloc extends Bloc<ThemeChanged, ThemeMode> {
   ThemeBloc() : super(settings.themeMode) {
     on<ThemeChanged>((event, emit) {
+      settings.setNewThemeMode(event.isDark ? ThemeMode.dark : ThemeMode.light);
       emit(event.isDark ? ThemeMode.dark : ThemeMode.light);
     });
   }

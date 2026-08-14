@@ -14,14 +14,14 @@ class SongsList extends StatelessWidget {
       builder: (context, snapshot) {
         // check connection state and errors during snapshot with data already done.
         if (snapshot.connectionState == ConnectionState.waiting) {
-          logger.logNS.i('Waiting for audio builder');
+          logger.logNS.d('Waiting for audio builder');
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           logger.log.e('Error during audio builder: ${snapshot.error}');
           return Center(child: Text('Ошибка: ${snapshot.error}'));
         } else if (snapshot.hasData) {
-          logger.logNS.i('Audio builder in process: snapshot has data');
-          logger.logNS.i('Returning ListView.builder');
+          logger.logNS.d('Audio builder in process: snapshot has data');
+          logger.logNS.d('Returning ListView.builder');
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {

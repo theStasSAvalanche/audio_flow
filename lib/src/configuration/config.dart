@@ -11,6 +11,7 @@ class Settings {
   Settings._internal();
 
   factory Settings() {
+    logger.log.d('Initialize settings singletone class object');
     return _instance;
   }
 
@@ -38,20 +39,20 @@ class Settings {
     await _prefs.clear();
   }
 
-  Future<void> initSettings() async {
+  static Future<void> initSettings() async {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  void dispose() async{
-    logger.log.i('Dispose of settings class. Write prefs to storage');
-    // await _prefs.setString(_keyUsername, value)
-    await _prefs.setBool('isDebug', isDebug);
-    await _prefs.setString('logLevel', logLevel.name);
-    await _prefs.setString('logFileName', logFileName);
-    await _prefs.setString('themeMode', themeMode.name);
-    await _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
-    logger.logNS.i('Settings succesfully saved');
-  }
+  // void dispose() async{
+  //   logger.log.d('Dispose of settings class. Write prefs to storage');
+  //   // await _prefs.setString(_keyUsername, value)
+  //   await _prefs.setBool('isDebug', isDebug);
+  //   await _prefs.setString('logLevel', logLevel.name);
+  //   await _prefs.setString('logFileName', logFileName);
+  //   await _prefs.setString('themeMode', themeMode.name);
+  //   await _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
+  //   logger.logNS.d('Settings succesfully saved');
+  // }
 }
 
 Level getLogLevel(String? level) {

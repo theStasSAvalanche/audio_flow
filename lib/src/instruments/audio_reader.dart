@@ -66,7 +66,7 @@ class AudioFlowFile {
 }
 
 Future<List<AudioFlowFile>> getAudioContent() async {
-  logger.log.i('Get audio content started');
+  logger.log.d('Get audio content started');
 
   final audioContent = <AudioFlowFile>[];
   final Directory audioDir = Directory(immortalizedPath);
@@ -78,7 +78,7 @@ Future<List<AudioFlowFile>> getAudioContent() async {
       audioContent.add(audioFile);
     }
   }
-  logger.log.i('Tracks found: audioContent');
+  logger.log.d('Tracks found: audioContent');
   // audioContent.sort();
 
   return audioContent;
@@ -87,10 +87,10 @@ Future<List<AudioFlowFile>> getAudioContent() async {
 
 Future<AudioMetadata> readMp3Tags(File file) async {
   final metadata = readMetadata(file, getImage: true); 
-  logger.log.i('Title: ${metadata.title}');
-  logger.log.i('Artist: ${metadata.artist}');
-  logger.log.i('Album: ${metadata.album}');
-  logger.log.i('Duration: ${metadata.duration}');
+  logger.log.d('Title: ${metadata.title}');
+  logger.log.d('Artist: ${metadata.artist}');
+  logger.log.d('Album: ${metadata.album}');
+  logger.log.d('Duration: ${metadata.duration}');
 
   return metadata;
 }
