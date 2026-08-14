@@ -5,7 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart'
   show getApplicationDocumentsDirectory, getExternalStorageDirectory;
 
-import 'package:audio_flow/src/configuration/config.dart' show Settings;
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 
 
 class AudioFlowLogger {
@@ -21,7 +21,6 @@ class AudioFlowLogger {
   late Logger logNS;
 }
 
-final settings = Settings();
 final logger = AudioFlowLogger();
 
 // We need async init function

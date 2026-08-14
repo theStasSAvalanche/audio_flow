@@ -1,11 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 
-import 'package:audio_flow/src/configuration/config.dart' show Settings;
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 
-
-
-final settings = Settings();
 
 class ThemeBloc extends Bloc<ThemeChanged, ThemeMode> {
   ThemeBloc() : super(settings.themeMode) {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
-import 'package:audio_flow/src/configuration/config.dart' show Settings;
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart';
 import 'package:audio_flow/src/ui/theme.dart' show darkTheme, lightTheme;
 import 'package:audio_flow/src/ui/routes/main_page.dart' show MainPage;
@@ -11,9 +11,6 @@ import 'package:audio_flow/src/ui/appbar.dart' show AudioFlowAppBar;
 import 'package:audio_flow/src/ui/bottombar.dart' show AudioFlowBottomBar;
 import 'package:audio_flow/src/ui/left_drawer.dart' show AudioFlowDrawer;
 import 'package:permission_handler/permission_handler.dart';
-
-
-final settings = Settings();
 
 
 class AudioFlowApp extends StatelessWidget {
@@ -42,6 +39,7 @@ class AudioFlowMaterial extends StatelessWidget {
         bloc: themeBloc,
         builder: (context, state) {
           return MaterialApp(
+            debugShowCheckedModeBanner: settings.isDebug,
             theme: lightTheme,
             darkTheme: darkTheme,
             themeMode: state,
@@ -53,6 +51,7 @@ class AudioFlowMaterial extends StatelessWidget {
                   child: BlocBuilder<PermissionBloc, PermissionState>(
                     builder: (context, state) {
                       if (state is PermissionGranted) {
+                        settings.isAudioFilesPermissionGranted = true;
                         return MainPage();
                       } else if (state is PermissionDenied) {
                         return Center(
