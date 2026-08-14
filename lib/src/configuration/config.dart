@@ -2,8 +2,6 @@ import 'package:logger/logger.dart' show Level;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 
-import 'package:audio_flow/src/configuration/logger.dart' show logger;
-
 
 class Settings {
   static final Settings _instance = Settings._internal();
@@ -11,8 +9,11 @@ class Settings {
   Settings._internal();
 
   factory Settings() {
-    logger.log.d('Initialize settings singletone class object');
     return _instance;
+  }
+
+  static Future<void> initSettings() async {
+    _prefs = await SharedPreferences.getInstance();
   }
 
   // make settings persistent
@@ -23,10 +24,8 @@ class Settings {
   var logLevel = getLogLevel(_prefs.getString('logLevel'));
   var logFileName = _prefs.getString('logFileName') ?? 'app_logs.txt';
 
-  // Graphically settings
+  // Application settings
   ThemeMode themeMode = _prefs.getString('themeMode') == 'dark' ? ThemeMode.dark : ThemeMode.light;
-
-  // System settings
   var isAudioFilesPermissionGranted = _prefs.getBool('isAudioFilesPermissionGranted') ?? false;
 
 
@@ -35,13 +34,9 @@ class Settings {
     await _prefs.setString('themeMode', themeMode.name);
   }
 
-  Future<void> clearAllSettings() async {
-    await _prefs.clear();
-  }
-
-  static Future<void> initSettings() async {
-    _prefs = await SharedPreferences.getInstance();
-  }
+  // Future<void> clearAllSettings() async {
+  //   await _prefs.clear();
+  // }
 
   // void dispose() async{
   //   logger.log.d('Dispose of settings class. Write prefs to storage');
@@ -72,7 +67,7 @@ Level getLogLevel(String? level) {
     case 'off':
       return Level.off;
     case _:
-      return Level.warning;
+      return Level.debug;
   }
 }
 
