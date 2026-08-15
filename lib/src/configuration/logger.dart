@@ -1,7 +1,6 @@
-import 'dart:io' show File;
+import 'dart:io' show File, FileMode;
 
 import 'package:logger/logger.dart';
-// TODO: import rotation_log
 import 'package:path_provider/path_provider.dart'
   show getApplicationDocumentsDirectory, getExternalStorageDirectory;
 
@@ -21,11 +20,10 @@ class AudioFlowLogger {
   late Logger logNS;
 }
 
+
 final logger = AudioFlowLogger();
 
-// We need async init function
-// because path_provider methods
-// have Future<T> results
+
 Future<void> initLogger() async {
   var directory = await getExternalStorageDirectory();  // Get the application's document directory
   directory = directory ?? await getApplicationDocumentsDirectory();
@@ -43,7 +41,43 @@ Logger createLogger({required File logFile, int prettyCount = 2}) {
     ),
     output: MultiOutput([
       ConsoleOutput(),
-      FileOutput(file: logFile),
+      RotatingFileOutput(file: logFile),
     ]),
   );
+}
+
+
+class RotatingFileOutput extends LogOutput {
+  final File file;
+  final int maxFileSize; // in bytes
+
+  RotatingFileOutput({required this.file, this.maxFileSize = 1024 * 1024}); // Default 1MB
+
+  @override
+  void output(OutputEvent event) async {
+    // Check if the current file exceeds the allowed max limit
+    if (await file.exists() && await file.length() >= maxFileSize) {
+      _rotateFiles();
+    }
+
+    // Write the log event lines to the file
+    for (var line in event.lines) {
+      await file.writeAsString('$line\n', mode: FileMode.append, flush: true);
+    }
+  }
+
+  void _rotateFiles() {
+    final basePath = file.path;
+    
+    // Deletes the oldest backup file if it exists
+    final oldestBackup = File('$basePath.2');
+    if (oldestBackup.existsSync()) oldestBackup.deleteSync();
+
+    // Shifts intermediate backup files
+    final midBackup = File('$basePath.1');
+    if (midBackup.existsSync()) midBackup.renameSync('$basePath.2');
+
+    // Renames current active file to backup sequence
+    if (file.existsSync()) file.renameSync('$basePath.1');
+  }
 }

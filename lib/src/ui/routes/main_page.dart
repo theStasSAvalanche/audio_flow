@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:flutter/material.dart';
 // import 'package:path_provider/path_provider.dart';
 
@@ -8,7 +9,8 @@ import 'package:audio_flow/src/ui/elements/songs_builder.dart' show SongsList;
 
 
 class MainPage extends StatelessWidget {
-  MainPage({super.key});
+  final AudioPlayerBloc audioPlayerBloc;
+  MainPage({super.key, required this.audioPlayerBloc});
 
   final audioList = <String>[];
 
@@ -51,7 +53,7 @@ class MainPage extends StatelessWidget {
             height: 8, 
           ),
           Expanded(
-            child: const SongsList(),
+            child: SongsList(audioPlayerBloc: audioPlayerBloc),
           ),
         ],
       ),

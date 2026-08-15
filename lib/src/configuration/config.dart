@@ -22,7 +22,7 @@ class Settings {
   // Debug and logging
   var isDebug = _prefs.getBool('isDebug') ?? false;
   var logLevel = getLogLevel(_prefs.getString('logLevel'));
-  var logFileName = _prefs.getString('logFileName') ?? 'app_logs.txt';
+  var logFileName = _prefs.getString('logFileName') ?? 'app_log.txt';
 
   // Application settings
   ThemeMode themeMode = _prefs.getString('themeMode') == 'dark' ? ThemeMode.dark : ThemeMode.light;
@@ -34,20 +34,17 @@ class Settings {
     await _prefs.setString('themeMode', themeMode.name);
   }
 
-  // Future<void> clearAllSettings() async {
-  //   await _prefs.clear();
-  // }
+  Future<void> clearAllSettings() async {
+    await _prefs.clear();
+  }
 
-  // void dispose() async{
-  //   logger.log.d('Dispose of settings class. Write prefs to storage');
-  //   // await _prefs.setString(_keyUsername, value)
-  //   await _prefs.setBool('isDebug', isDebug);
-  //   await _prefs.setString('logLevel', logLevel.name);
-  //   await _prefs.setString('logFileName', logFileName);
-  //   await _prefs.setString('themeMode', themeMode.name);
-  //   await _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
-  //   logger.logNS.d('Settings succesfully saved');
-  // }
+  void dispose() async{
+    await _prefs.setBool('isDebug', isDebug);
+    await _prefs.setString('logLevel', logLevel.name);
+    await _prefs.setString('logFileName', logFileName);
+    await _prefs.setString('themeMode', themeMode.name);
+    await _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
+  }
 }
 
 Level getLogLevel(String? level) {

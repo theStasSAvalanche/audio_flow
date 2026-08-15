@@ -2,13 +2,14 @@ import 'package:audio_flow/src/bloc/permission_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart';
 import 'package:audio_flow/src/ui/theme.dart' show darkTheme, lightTheme;
 import 'package:audio_flow/src/ui/routes/main_page.dart' show MainPage;
-import 'package:audio_flow/src/ui/appbar.dart' show AudioFlowAppBar;
-import 'package:audio_flow/src/ui/bottombar.dart' show AudioFlowBottomBar;
+import 'package:audio_flow/src/ui/app_bar.dart' show AudioFlowAppBar;
+import 'package:audio_flow/src/ui/bottom_bar.dart' show AudioFlowBottomBar;
 import 'package:audio_flow/src/ui/left_drawer.dart' show AudioFlowDrawer;
 import 'package:permission_handler/permission_handler.dart';
 
@@ -30,10 +31,12 @@ class AudioFlowMaterial extends StatelessWidget {
   Widget build(BuildContext context) {
     logger.log.d('Start building MaterialApp widget');
     final themeBloc = ThemeBloc();
+    final audioPlayerBloc = AudioPlayerBloc();
 
     return MultiBlocProvider(
       providers: [
         BlocProvider<ThemeBloc>(create: (context) => themeBloc),
+        BlocProvider<AudioPlayerBloc>(create: (context) => audioPlayerBloc)
       ],
       child: BlocBuilder<ThemeBloc, ThemeMode>(
         bloc: themeBloc,
@@ -52,7 +55,7 @@ class AudioFlowMaterial extends StatelessWidget {
                     builder: (context, state) {
                       if (state is PermissionGranted) {
                         settings.isAudioFilesPermissionGranted = true;
-                        return MainPage();
+                        return MainPage(audioPlayerBloc: audioPlayerBloc,);
                       } else if (state is PermissionDenied) {
                         return Center(
                           child: Column(

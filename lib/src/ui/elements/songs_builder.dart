@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/instruments/audio_reader.dart' show AudioFlowFile, getAudioContent;
 
 
 class SongsList extends StatelessWidget {
-  const SongsList({super.key});
+  final AudioPlayerBloc audioPlayerBloc;
+  const SongsList({super.key, required this.audioPlayerBloc});
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +30,13 @@ class SongsList extends StatelessWidget {
               var song = snapshot.data![index];
               return ListTile(
                 title: Text(song.toString()),
-                onTap: () {},
+                onTap: () => audioPlayerBloc.add(AudioPlayerPlayEvent(song.metadata!.file.path)),
                 trailing: IconButton(
                   icon: Icon(
                     Icons.remove,
                   ),
                   onPressed: () {},
-                ),
+                )
               );
             },
           );

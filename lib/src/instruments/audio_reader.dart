@@ -7,6 +7,7 @@ import 'package:audio_flow/src/configuration/logger.dart' show logger;
 const immortalizedPath = '/storage/emulated/0/Music/Disturbed/Albums/2015 - Immortalized/';
 
 class AudioFlowFile {
+  AudioMetadata? metadata;
   late final String title;
   String? artist;
   String? album;
@@ -16,6 +17,7 @@ class AudioFlowFile {
   AudioFlowFile({required this.title});
 
   AudioFlowFile.fromMetadata(AudioMetadata metadata) {
+    this.metadata = metadata;
     title = metadata.title ?? metadata.file.path.split(Platform.pathSeparator).last;
     artist = metadata.artist;
     album = metadata.album;
@@ -87,10 +89,10 @@ Future<List<AudioFlowFile>> getAudioContent() async {
 
 Future<AudioMetadata> readMp3Tags(File file) async {
   final metadata = readMetadata(file, getImage: true); 
-  logger.log.d('Title: ${metadata.title}');
-  logger.log.d('Artist: ${metadata.artist}');
-  logger.log.d('Album: ${metadata.album}');
-  logger.log.d('Duration: ${metadata.duration}');
+  // logger.log.d('Title: ${metadata.title}');
+  // logger.log.d('Artist: ${metadata.artist}');
+  // logger.log.d('Album: ${metadata.album}');
+  // logger.log.d('Duration: ${metadata.duration}');
 
   return metadata;
 }
