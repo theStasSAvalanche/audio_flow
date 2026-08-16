@@ -4,7 +4,7 @@ part of 'audio_player_bloc.dart';
 sealed class AudioPlayerEvent {}
 
 class AudioPlayerPlayEvent extends AudioPlayerEvent {
-  final String filePath;
+  final String? filePath;
 
   AudioPlayerPlayEvent(this.filePath);
 }

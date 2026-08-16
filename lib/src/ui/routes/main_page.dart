@@ -16,7 +16,7 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.log.d('Srart building widgets on main page route!');
+    logger.log.d('Start building widgets on main page route!');
     final double screenHeight = MediaQuery.sizeOf(context).height;
 
     return Padding(

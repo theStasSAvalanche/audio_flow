@@ -3,6 +3,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 
 
+enum AudioStatus {
+  initial,
+  playing,
+  paused,
+}
+
 class Settings {
   static final Settings _instance = Settings._internal();
 
@@ -26,24 +32,29 @@ class Settings {
 
   // Application settings
   ThemeMode themeMode = _prefs.getString('themeMode') == 'dark' ? ThemeMode.dark : ThemeMode.light;
+  AudioStatus playerStatus = AudioStatus.initial;
   var isAudioFilesPermissionGranted = _prefs.getBool('isAudioFilesPermissionGranted') ?? false;
 
 
-  void setNewThemeMode(ThemeMode newThemeMode) async {
+  void setNewThemeMode(ThemeMode newThemeMode) {
     themeMode = newThemeMode;
-    await _prefs.setString('themeMode', themeMode.name);
+    _prefs.setString('themeMode', themeMode.name);
   }
 
   Future<void> clearAllSettings() async {
     await _prefs.clear();
   }
 
-  void dispose() async{
-    await _prefs.setBool('isDebug', isDebug);
-    await _prefs.setString('logLevel', logLevel.name);
-    await _prefs.setString('logFileName', logFileName);
-    await _prefs.setString('themeMode', themeMode.name);
-    await _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
+  void setPlayerStatus(AudioStatus newStatus) {
+    playerStatus = newStatus;
+  }
+
+  void dispose() {
+    _prefs.setBool('isDebug', isDebug);
+    _prefs.setString('logLevel', logLevel.name);
+    _prefs.setString('logFileName', logFileName);
+    _prefs.setString('themeMode', themeMode.name);
+    _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
   }
 }
 
@@ -65,6 +76,18 @@ Level getLogLevel(String? level) {
       return Level.off;
     case _:
       return Level.debug;
+  }
+}
+
+AudioStatus getPlayerStatus(String? status) {
+  switch (status) {
+    case 'playing':
+      return AudioStatus.playing;
+    case 'paused':
+      return AudioStatus.paused;
+    case 'initial':
+    case _:
+      return AudioStatus.initial;
   }
 }
 

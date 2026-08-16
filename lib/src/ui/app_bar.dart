@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
 
-
 class AudioFlowAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ThemeBloc themeBloc;
-  const AudioFlowAppBar({super.key, required this.themeBloc});
+
+  const AudioFlowAppBar({
+    super.key,
+    required this.themeBloc,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,7 @@ class AudioFlowAppBar extends StatelessWidget implements PreferredSizeWidget {
           value: themeBloc.state == ThemeMode.dark,
           onChanged: (value) {
             themeBloc.add(ThemeChanged(value));
-          }
+          },
         ),
       ],
     );

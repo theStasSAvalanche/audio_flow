@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 
-class AudioFlowBottomBar extends StatelessWidget implements PreferredSizeWidget {
-  const AudioFlowBottomBar({super.key});
+class AudioFlowBottomBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  final AudioPlayerBloc audioPlayerBloc;
+
+  const AudioFlowBottomBar({super.key, required this.audioPlayerBloc});
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +24,9 @@ class AudioFlowBottomBar extends StatelessWidget implements PreferredSizeWidget 
                 onPressed: () {},
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.skip_previous),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.skip_next),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.repeat),
-              onPressed: () {},
-            )
+            IconButton(icon: const Icon(Icons.skip_previous), onPressed: () {}),
+            IconButton(icon: const Icon(Icons.skip_next), onPressed: () {}),
+            IconButton(icon: const Icon(Icons.repeat), onPressed: () {}),
           ],
         ),
       ),
