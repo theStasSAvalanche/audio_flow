@@ -66,6 +66,9 @@ class _SongsListViewState extends State<SongsListView> {
             title: Text(song.toString()),
             selectedTileColor: Colors.blue.withValues(alpha: 0.2),
             selected: isSelected,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0), // Adjust the radius here
+            ),
             onTap: () {
               setState(() {
                 _selectedItemId = index; // Update state on click
