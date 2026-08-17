@@ -37,72 +37,74 @@ class AudioFlowMaterial extends StatelessWidget {
         BlocProvider<ThemeBloc>(create: (context) => themeBloc),
         BlocProvider<AudioPlayerBloc>(create: (context) => audioPlayerBloc),
       ],
-      child: BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
-        bloc: audioPlayerBloc,
-        builder: (contextA, stateA) {
-        return BlocBuilder<ThemeBloc, ThemeMode>(
-          bloc: themeBloc,
-          builder: (contextT, stateT) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: settings.isDebug,
-              theme: lightTheme,
-              darkTheme: darkTheme,
-              themeMode: stateT,
-              home: Scaffold(
-                appBar: AudioFlowAppBar(themeBloc: themeBloc),
-                body: SafeArea(
-                  child: BlocProvider(
-                    create: (context) => PermissionBloc(),
-                    child: BlocBuilder<PermissionBloc, PermissionState>(
-                      builder: (context, state) {
-                        if (state is PermissionGranted) {
-                          settings.isAudioFilesPermissionGranted = true;
-                          return MainPage(audioPlayerBloc: audioPlayerBloc);
-                        } else if (state is PermissionDenied) {
-                          return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Permission Denied. Please enable it in settings.",
-                                ),
-                                ElevatedButton(
-                                  onPressed: () => openAppSettings(),
-                                  child: const Text("Open Settings"),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                    ),
+      child: BlocBuilder<ThemeBloc, ThemeMode>(
+        bloc: themeBloc,
+        builder: (contextT, stateT) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: settings.isDebug,
+            theme: lightTheme,
+            darkTheme: darkTheme,
+            themeMode: stateT,
+            home: Scaffold(
+              appBar: AudioFlowAppBar(themeBloc: themeBloc),
+              body: SafeArea(
+                child: BlocProvider(
+                  create: (context) => PermissionBloc(),
+                  child: BlocBuilder<PermissionBloc, PermissionState>(
+                    builder: (context, state) {
+                      if (state is PermissionGranted) {
+                        settings.isAudioFilesPermissionGranted = true;
+                        return MainPage(audioPlayerBloc: audioPlayerBloc);
+                      } else if (state is PermissionDenied) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Permission Denied. Please enable it in settings.",
+                              ),
+                              ElevatedButton(
+                                onPressed: () => openAppSettings(),
+                                child: const Text("Open Settings"),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const Center(child: CircularProgressIndicator());
+                    },
                   ),
                 ),
-                drawer: AudioFlowDrawer(),
-                bottomNavigationBar: AudioFlowBottomBar(
-                  audioPlayerBloc: audioPlayerBloc,
-                ),
-                floatingActionButtonLocation: .centerDocked,
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    if (settings.playerStatus == AudioStatus.initial || settings.playerStatus == AudioStatus.paused) {
-                      audioPlayerBloc.add(AudioPlayerPlayEvent(null));
+              ),
+              drawer: AudioFlowDrawer(),
+              bottomNavigationBar: AudioFlowBottomBar(
+                audioPlayerBloc: audioPlayerBloc,
+              ),
+              floatingActionButtonLocation: .centerDocked,
+              floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  if (settings.playerStatus == AudioStatus.initial || settings.playerStatus == AudioStatus.paused) {
+                    audioPlayerBloc.add(AudioPlayerPlayEvent(null));
+                  }
+                  else if (settings.playerStatus == AudioStatus.playing) {
+                    audioPlayerBloc.add(AudioPlayerPauseEvent());
+                  }
+                },
+                tooltip: 'Play/Pause',
+                child: BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
+                  bloc: audioPlayerBloc,
+                  builder: (contextA, stateA) {
+                    if (stateA is AudioPlayerPlaying) {
+                      return Icon(Icons.pause);
                     }
-                    else if (settings.playerStatus == AudioStatus.playing) {
-                      audioPlayerBloc.add(AudioPlayerPauseEvent());
-                    }
+
+                    return Icon(Icons.play_arrow);
                   },
-                  tooltip: 'Play/Pause',
-                  child: stateA is AudioPlayerPaused ?
-                    Icon(Icons.play_arrow) :
-                    Icon(Icons.pause),
                 ),
               ),
-            );
-          });
-        },
-      ),
+            ),
+          );
+        }),
     );
   }
 }
