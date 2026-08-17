@@ -38,7 +38,7 @@ class SongsList extends StatelessWidget {
   }
 }
 
-class SongsListView extends StatelessWidget {
+class SongsListView extends StatefulWidget {
   final AsyncSnapshot<List<AudioFlowFile>> snapshot;
   final AudioPlayerBloc audioPlayerBloc;
   const SongsListView({
@@ -48,31 +48,46 @@ class SongsListView extends StatelessWidget {
   });
 
   @override
+  State<SongsListView> createState() => _SongsListViewState();
+}
+
+class _SongsListViewState extends State<SongsListView> {
+  int? _selectedItemId;
+
+  @override
   Widget build(BuildContext context) {
     return ListView.custom(
       childrenDelegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
-          final song = snapshot.data![index];
+          final song = widget.snapshot.data![index];
+          final isSelected = _selectedItemId == index;
           return ListTile(
             key: ValueKey(song.metadata!.file.path), 
             title: Text(song.toString()),
             selectedTileColor: Colors.blue.withValues(alpha: 0.2),
+            selected: isSelected,
             onTap: () {
-              audioPlayerBloc.add(AudioPlayerPlayEvent(song.metadata!.file.path));
+              setState(() {
+                _selectedItemId = index; // Update state on click
+              });
+              widget.audioPlayerBloc.add(AudioPlayerPlayEvent(song.metadata!.file.path));
             },
             trailing: IconButton(
               icon: Icon(
                 Icons.music_note,
               ),
               onPressed: () {
+                setState(() {
+                  _selectedItemId = index; // Update state on click
+                });
               },
             )
           );
         },
-        childCount: snapshot.data!.length,
+        childCount: widget.snapshot.data!.length,
         findChildIndexCallback: (Key key) {
           final ValueKey targetKey = key as ValueKey;
-          final index  = snapshot.data!.indexWhere((song) => ValueKey(song.metadata!.file.path) == targetKey);
+          final index  = widget.snapshot.data!.indexWhere((song) => ValueKey(song.metadata!.file.path) == targetKey);
           return index >= 0 ? index : null;
         },
       ),
