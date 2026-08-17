@@ -13,6 +13,7 @@ class AudioFlowFile {
   String? album;
   Picture? albumArt;
   String? duration;
+  int? trackNumber;
 
   AudioFlowFile({required this.title});
 
@@ -25,6 +26,7 @@ class AudioFlowFile {
       albumArt = metadata.pictures.first;
     }
     duration = metadata.duration.toString();
+    trackNumber = metadata.trackNumber;
   }
 
   @override
@@ -61,6 +63,17 @@ class AudioFlowFile {
       else if (album != other.album) {
         return album!.compareTo(other.album!);
       }
+      else if (album == other.album) {
+        if (trackNumber == null && other.trackNumber != null) {
+          return 1;
+        }
+        else if (trackNumber != null && other.trackNumber == null) {
+          return -1;
+        }
+        else {
+          return trackNumber! < other.trackNumber! ? -1 : 1;
+        }
+      }
     }
 
     return title.compareTo(other.title);
@@ -81,7 +94,7 @@ Future<List<AudioFlowFile>> getAudioContent() async {
     }
   }
   logger.log.d('Tracks found: audioContent');
-  // audioContent.sort();
+  audioContent.sort((a, b) => a.compareTo(b));
 
   return audioContent;
 }

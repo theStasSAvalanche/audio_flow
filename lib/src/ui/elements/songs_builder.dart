@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
@@ -24,21 +25,9 @@ class SongsList extends StatelessWidget {
         } else if (snapshot.hasData) {
           logger.logNS.d('Audio builder in process: snapshot has data');
           logger.logNS.d('Returning ListView.builder');
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              var song = snapshot.data![index];
-              return ListTile(
-                title: Text(song.toString()),
-                onTap: () => audioPlayerBloc.add(AudioPlayerPlayEvent(song.metadata!.file.path)),
-                trailing: IconButton(
-                  icon: Icon(
-                    Icons.remove,
-                  ),
-                  onPressed: () {},
-                )
-              );
-            },
+          return SongsListView(
+            snapshot: snapshot,
+            audioPlayerBloc: audioPlayerBloc,
           );
         } else {
           // Если данных нет, показываем сообщение об этом
@@ -48,3 +37,46 @@ class SongsList extends StatelessWidget {
     );
   }
 }
+
+class SongsListView extends StatelessWidget {
+  final AsyncSnapshot<List<AudioFlowFile>> snapshot;
+  final AudioPlayerBloc audioPlayerBloc;
+  const SongsListView({
+    super.key,
+    required this.snapshot,
+    required this.audioPlayerBloc,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.custom(
+      childrenDelegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          final song = snapshot.data![index];
+          return ListTile(
+            key: ValueKey(song.metadata!.file.path), 
+            title: Text(song.toString()),
+            selectedTileColor: Colors.blue.withValues(alpha: 0.2),
+            onTap: () {
+              audioPlayerBloc.add(AudioPlayerPlayEvent(song.metadata!.file.path));
+            },
+            trailing: IconButton(
+              icon: Icon(
+                Icons.music_note,
+              ),
+              onPressed: () {
+              },
+            )
+          );
+        },
+        childCount: snapshot.data!.length,
+        findChildIndexCallback: (Key key) {
+          final ValueKey targetKey = key as ValueKey;
+          final index  = snapshot.data!.indexWhere((song) => ValueKey(song.metadata!.file.path) == targetKey);
+          return index >= 0 ? index : null;
+        },
+      ),
+    );
+  }
+}
+
