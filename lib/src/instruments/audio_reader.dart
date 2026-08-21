@@ -9,7 +9,7 @@ const immortalizedPath = '/storage/emulated/0/Music/Disturbed/Albums/2015 - Immo
 class AudioFlowFile {
   AudioMetadata? metadata;
   final String filePath;
-  late final String title;
+  final String title;
   String? artist;
   String? album;
   Picture? albumArt;
@@ -19,10 +19,10 @@ class AudioFlowFile {
   AudioFlowFile({required this.filePath, required this.title});
 
   AudioFlowFile.fromMetadata({required AudioMetadata metadata}) :
-    filePath = metadata.file.path
+    filePath = metadata.file.path,
+    title = metadata.title ?? metadata.file.path.split(Platform.pathSeparator).last
   {
     this.metadata = metadata;
-    title = metadata.title ?? metadata.file.path.split(Platform.pathSeparator).last;
     artist = metadata.artist;
     album = metadata.album;
     if (metadata.pictures.isNotEmpty) {
