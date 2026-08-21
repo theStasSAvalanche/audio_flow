@@ -1,9 +1,10 @@
+import 'package:audio_flow/src/models/audio_flow_file.dart';
 import 'package:flutter/material.dart';
 
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/configuration/config.dart' show settings;
-import 'package:audio_flow/src/instruments/audio_reader.dart' show AudioFlowFile, getAudioContent;
+import 'package:audio_flow/src/instruments/audio_hive_middleware.dart' show getPlaylistFromHive;
 
 
 class SongsList extends StatelessWidget {
@@ -13,7 +14,7 @@ class SongsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<AudioFlowFile>>(
-      future: getAudioContent(),
+      future: getPlaylistFromHive('playlist'),
       builder: (context, snapshot) {
         // check connection state and errors during snapshot with data already done.
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -62,7 +63,7 @@ class _SongsListViewState extends State<SongsListView> {
           final song = widget.snapshot.data![index];
           final isSelected = _selectedItemId == index;
           return ListTile(
-            key: ValueKey(song.metadata!.file.path), 
+            key: ValueKey(song.filePath), 
             title: Text(song.toString()),
             selectedTileColor: Colors.blue.withValues(alpha: 0.2),
             selected: isSelected,
@@ -74,7 +75,7 @@ class _SongsListViewState extends State<SongsListView> {
                 _selectedItemId = index;
                 settings.currentTrack = index;
               });
-              widget.audioPlayerBloc.add(AudioPlayerPlayEvent(song.metadata!.file.path));
+              widget.audioPlayerBloc.add(AudioPlayerPlayEvent(song.filePath));
             },
             trailing: IconButton(
               icon: Icon(
@@ -85,7 +86,7 @@ class _SongsListViewState extends State<SongsListView> {
                   _selectedItemId = index;
                   settings.currentTrack = index;
                 });
-                widget.audioPlayerBloc.add(AudioPlayerPlayEvent(song.metadata!.file.path));
+                widget.audioPlayerBloc.add(AudioPlayerPlayEvent(song.filePath));
               },
             )
           );
@@ -93,7 +94,7 @@ class _SongsListViewState extends State<SongsListView> {
         childCount: widget.snapshot.data!.length,
         findChildIndexCallback: (Key key) {
           final ValueKey targetKey = key as ValueKey;
-          final index  = widget.snapshot.data!.indexWhere((song) => ValueKey(song.metadata!.file.path) == targetKey);
+          final index  = widget.snapshot.data!.indexWhere((song) => ValueKey(song.filePath) == targetKey);
           return index >= 0 ? index : null;
         },
       ),

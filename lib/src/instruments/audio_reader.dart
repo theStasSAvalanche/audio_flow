@@ -1,106 +1,43 @@
+import 'dart:collection';
 import 'dart:io';
+import 'package:audio_flow/src/models/audio_flow_file.dart';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
+import 'package:audio_flow/src/instruments/audio_hive_middleware.dart'
+    show savePlaylistToHive;
 
-
-const immortalizedPath = '/storage/emulated/0/Music/Disturbed/Albums/2015 - Immortalized/';
-
-class AudioFlowFile {
-  AudioMetadata? metadata;
-  final String filePath;
-  final String title;
-  String? artist;
-  String? album;
-  Picture? albumArt;
-  String? duration;
-  int? trackNumber;
-
-  AudioFlowFile({required this.filePath, required this.title});
-
-  AudioFlowFile.fromMetadata({required AudioMetadata metadata}) :
-    filePath = metadata.file.path,
-    title = metadata.title ?? metadata.file.path.split(Platform.pathSeparator).last,
-    metadata = metadata,
-    artist = metadata.artist,
-    album = metadata.album,
-    albumArt = metadata.pictures.isNotEmpty ? metadata.pictures.first : null,
-    duration = metadata.duration.toString(),
-    trackNumber = metadata.trackNumber;
-
-  @override
-  String toString() {
-    var buffer = StringBuffer();
-    if (artist != null) {
-      buffer.write('$artist - ');
-    }
-    if (album != null) {
-      buffer.write('$album - ');
-    }
-    buffer.write(title);
-    return buffer.toString();
-  }
-
-  int compareTo(AudioFlowFile other) {
-    if (other.artist == null && artist != null) {
-      return -1;
-    }
-    else if (artist == null && other.artist != null) {
-      return 1;
-    }
-    else if (artist != other.artist) {
-      return artist!.compareTo(other.artist!);
-    }
-    else if (artist != null && other.artist != null) {
-      
-      if (other.album == null && album != null) {
-        return -1;
-      }
-      else if (album == null && other.album != null) {
-        return 1;
-      }
-      else if (album != other.album) {
-        return album!.compareTo(other.album!);
-      }
-      else if (album == other.album) {
-        if (trackNumber == null && other.trackNumber != null) {
-          return 1;
-        }
-        else if (trackNumber != null && other.trackNumber == null) {
-          return -1;
-        }
-        else {
-          return trackNumber! < other.trackNumber! ? -1 : 1;
-        }
-      }
-    }
-
-    return title.compareTo(other.title);
-  }
-}
-
-Future<List<AudioFlowFile>> getAudioContent() async {
+Future<void> getAudioContentFromStorage(String folder) async {
   logger.log.d('Get audio content started');
 
-  final audioContent = <AudioFlowFile>[];
-  final Directory audioDir = Directory(immortalizedPath);
+  final audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
+  // final audioContent = <AudioFlowFile>[];
+  final Directory audioDir = Directory(folder);
 
-  List<FileSystemEntity> entities = await audioDir.list(recursive: false, followLinks: false).toList();
+  List<FileSystemEntity> entities = await audioDir
+      .list(recursive: true, followLinks: false)
+      .toList();
   for (var entity in entities) {
     if (entity is File && entity.path.endsWith('mp3')) {
-      var audioFile = AudioFlowFile.fromMetadata(metadata: await readMp3Tags(entity));
-      audioContent.add(audioFile);
+      var audioFile = AudioFlowFile.fromMetadata(
+        metadata: await readMp3Tags(entity),
+      );
+      if (audioFile.artist != null && audioFile.album != null) {
+        audioDatabase
+            .putIfAbsent('_${audioFile.artist}_${audioFile.album}', () => [])
+            .add(audioFile);
+      } else {
+        audioDatabase.putIfAbsent('Untagged', () => []).add(audioFile);
+      }
     }
   }
   logger.log.d('Tracks found: audioContent');
-  audioContent.sort((a, b) => a.compareTo(b));
 
-  return audioContent;
+  savePlaylistToHive('playlist', audioDatabase);
 }
 
-
 Future<AudioMetadata> readMp3Tags(File file) async {
-  final metadata = readMetadata(file, getImage: true); 
+  final metadata = readMetadata(file, getImage: true);
   logger.log.t('Title: ${metadata.title}');
   logger.log.t('Artist: ${metadata.artist}');
   logger.log.t('Album: ${metadata.album}');

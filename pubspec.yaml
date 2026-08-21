@@ -44,6 +44,9 @@ dependencies:
   audio_metadata_reader: ^1.7.1
   permission_handler: ^13.0.1
   shared_preferences: ^2.5.5
+  hive_ce: ^2.19.3
+  hive_ce_flutter: ^2.3.4
+  hive_ce_generator: ^1.11.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
