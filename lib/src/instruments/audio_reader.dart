@@ -20,17 +20,13 @@ class AudioFlowFile {
 
   AudioFlowFile.fromMetadata({required AudioMetadata metadata}) :
     filePath = metadata.file.path,
-    title = metadata.title ?? metadata.file.path.split(Platform.pathSeparator).last
-  {
-    this.metadata = metadata;
-    artist = metadata.artist;
-    album = metadata.album;
-    if (metadata.pictures.isNotEmpty) {
-      albumArt = metadata.pictures.first;
-    }
-    duration = metadata.duration.toString();
+    title = metadata.title ?? metadata.file.path.split(Platform.pathSeparator).last,
+    metadata = metadata,
+    artist = metadata.artist,
+    album = metadata.album,
+    albumArt = metadata.pictures.isNotEmpty ? metadata.pictures.first : null,
+    duration = metadata.duration.toString(),
     trackNumber = metadata.trackNumber;
-  }
 
   @override
   String toString() {
