@@ -4,8 +4,6 @@ import 'package:audio_flow/src/models/audio_flow_file.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
-import 'package:audio_flow/src/instruments/audio_reader.dart'
-    show getAudioContentFromStorage;
 
 
 const immortalizedPath =
