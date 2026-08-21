@@ -34,6 +34,7 @@ class Settings {
   ThemeMode themeMode = _prefs.getString('themeMode') == 'dark' ? ThemeMode.dark : ThemeMode.light;
   AudioStatus playerStatus = AudioStatus.initial;
   var isAudioFilesPermissionGranted = _prefs.getBool('isAudioFilesPermissionGranted') ?? false;
+  var currentTrack = 0;
 
 
   void setNewThemeMode(ThemeMode newThemeMode) {

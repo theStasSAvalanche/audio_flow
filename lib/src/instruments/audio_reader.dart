@@ -8,6 +8,7 @@ const immortalizedPath = '/storage/emulated/0/Music/Disturbed/Albums/2015 - Immo
 
 class AudioFlowFile {
   AudioMetadata? metadata;
+  final String filePath;
   late final String title;
   String? artist;
   String? album;
@@ -15,9 +16,11 @@ class AudioFlowFile {
   String? duration;
   int? trackNumber;
 
-  AudioFlowFile({required this.title});
+  AudioFlowFile({required this.filePath, required this.title});
 
-  AudioFlowFile.fromMetadata(AudioMetadata metadata) {
+  AudioFlowFile.fromMetadata({required AudioMetadata metadata}) :
+    filePath = metadata.file.path
+  {
     this.metadata = metadata;
     title = metadata.title ?? metadata.file.path.split(Platform.pathSeparator).last;
     artist = metadata.artist;
@@ -89,7 +92,7 @@ Future<List<AudioFlowFile>> getAudioContent() async {
   List<FileSystemEntity> entities = await audioDir.list(recursive: false, followLinks: false).toList();
   for (var entity in entities) {
     if (entity is File && entity.path.endsWith('mp3')) {
-      var audioFile = AudioFlowFile.fromMetadata(await readMp3Tags(entity));
+      var audioFile = AudioFlowFile.fromMetadata(metadata: await readMp3Tags(entity));
       audioContent.add(audioFile);
     }
   }
@@ -102,10 +105,10 @@ Future<List<AudioFlowFile>> getAudioContent() async {
 
 Future<AudioMetadata> readMp3Tags(File file) async {
   final metadata = readMetadata(file, getImage: true); 
-  // logger.log.d('Title: ${metadata.title}');
-  // logger.log.d('Artist: ${metadata.artist}');
-  // logger.log.d('Album: ${metadata.album}');
-  // logger.log.d('Duration: ${metadata.duration}');
+  logger.log.t('Title: ${metadata.title}');
+  logger.log.t('Artist: ${metadata.artist}');
+  logger.log.t('Album: ${metadata.album}');
+  logger.log.t('Duration: ${metadata.duration}');
 
   return metadata;
 }

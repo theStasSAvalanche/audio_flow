@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/instruments/audio_reader.dart' show AudioFlowFile, getAudioContent;
 
 
@@ -71,7 +71,8 @@ class _SongsListViewState extends State<SongsListView> {
             ),
             onTap: () {
               setState(() {
-                _selectedItemId = index; // Update state on click
+                _selectedItemId = index;
+                settings.currentTrack = index;
               });
               widget.audioPlayerBloc.add(AudioPlayerPlayEvent(song.metadata!.file.path));
             },
@@ -81,8 +82,10 @@ class _SongsListViewState extends State<SongsListView> {
               ),
               onPressed: () {
                 setState(() {
-                  _selectedItemId = index; // Update state on click
+                  _selectedItemId = index;
+                  settings.currentTrack = index;
                 });
+                widget.audioPlayerBloc.add(AudioPlayerPlayEvent(song.metadata!.file.path));
               },
             )
           );
