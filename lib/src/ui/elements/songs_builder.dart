@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/configuration/config.dart' show settings;
-import 'package:audio_flow/src/instruments/audio_hive_middleware.dart' show getPlaylistFromHive;
+import 'package:audio_flow/src/instruments/hive_audio_database.dart' show getPlaylistFromHive;
 
 
 class SongsList extends StatelessWidget {
@@ -26,6 +26,7 @@ class SongsList extends StatelessWidget {
         } else if (snapshot.hasData) {
           logger.logNS.d('Audio builder in process: snapshot has data');
           logger.logNS.d('Returning ListView.builder');
+          settings.audioPlaylist = snapshot.data!;
           return SongsListView(
             snapshot: snapshot,
             audioPlayerBloc: audioPlayerBloc,
@@ -53,7 +54,7 @@ class SongsListView extends StatefulWidget {
 }
 
 class _SongsListViewState extends State<SongsListView> {
-  int? _selectedItemId;
+  var _selectedItemId = settings.currentTrack;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +69,7 @@ class _SongsListViewState extends State<SongsListView> {
             selectedTileColor: Colors.blue.withValues(alpha: 0.2),
             selected: isSelected,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0), // Adjust the radius here
+              borderRadius: BorderRadius.circular(8.0),
             ),
             onTap: () {
               setState(() {
@@ -84,7 +85,7 @@ class _SongsListViewState extends State<SongsListView> {
               onPressed: () {
                 setState(() {
                   _selectedItemId = index;
-                  settings.currentTrack = index;
+                  settings.setCurrentTrack(index);
                 });
                 widget.audioPlayerBloc.add(AudioPlayerPlayEvent(song.filePath));
               },

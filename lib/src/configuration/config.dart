@@ -1,3 +1,4 @@
+import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
 import 'package:logger/logger.dart' show Level;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart' show ThemeMode;
@@ -34,8 +35,12 @@ class Settings {
   ThemeMode themeMode = _prefs.getString('themeMode') == 'dark' ? ThemeMode.dark : ThemeMode.light;
   AudioStatus playerStatus = AudioStatus.initial;
   var isAudioFilesPermissionGranted = _prefs.getBool('isAudioFilesPermissionGranted') ?? false;
-  var currentTrack = 0;
+  var currentTrack = _prefs.getInt('currentTrack') ?? -1;
+  var isRandom = _prefs.getBool('isRandom') ?? false;
+  var isRepeat = _prefs.getBool('isRepeat') ?? false;
 
+  // Additional structures
+  late List<AudioFlowFile> audioPlaylist;
 
   void setNewThemeMode(ThemeMode newThemeMode) {
     themeMode = newThemeMode;
@@ -50,12 +55,30 @@ class Settings {
     playerStatus = newStatus;
   }
 
+  void setCurrentTrack(int trackNumber) {
+    settings.currentTrack = trackNumber;
+    _prefs.setInt('currentTrack', trackNumber);
+  }
+
+  void changeRandomMode() {
+    settings.isRandom = !settings.isRandom;
+    _prefs.setBool('isRandom', settings.isRandom);
+  }
+
+  void changeRepeatMode() {
+    settings.isRepeat = !settings.isRepeat;
+    _prefs.setBool('isRepeat', settings.isRepeat);
+  }
+
   void dispose() {
     _prefs.setBool('isDebug', isDebug);
     _prefs.setString('logLevel', logLevel.name);
     _prefs.setString('logFileName', logFileName);
     _prefs.setString('themeMode', themeMode.name);
     _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
+    _prefs.setInt('currentTrack', settings.currentTrack);
+    _prefs.setBool('isRandom', settings.isRandom);
+    _prefs.setBool('isRepeat', settings.isRepeat);
   }
 }
 

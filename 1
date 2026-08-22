@@ -1,0 +1,15 @@
+Host gitlab.devops-labs.ru
+    HostName gitlab.devops-labs.ru
+    Port 22
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    ProxyCommand          nc -X connect -x 127.0.0.1:10808 %h %p
+
+
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    ProxyCommand	nc -X connect -x 127.0.0.1:10808 %h %p

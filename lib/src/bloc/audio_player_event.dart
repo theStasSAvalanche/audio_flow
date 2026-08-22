@@ -10,5 +10,5 @@ class AudioPlayerPlayEvent extends AudioPlayerEvent {
 }
 class AudioPlayerPauseEvent extends AudioPlayerEvent {}
 class AudioPlayerStopEvent extends AudioPlayerEvent {}
-class AudioPlayerNextPlayEvent extends AudioPlayerEvent {}
-class AudioPlayerPreviousPlayEvent extends AudioPlayerEvent {}
+class AudioPlayerNextEvent extends AudioPlayerEvent {}
+class AudioPlayerPreviousEvent extends AudioPlayerEvent {}
