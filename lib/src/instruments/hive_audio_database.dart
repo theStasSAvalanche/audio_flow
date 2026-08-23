@@ -15,7 +15,7 @@ Future<List<AudioFlowFile>> getPlaylistFromHive(
   String playlist,
 ) async {
   logger.log.d('Get playlist with name: $playlist from Hive');
-  getAudioContentFromStorage(immortalizedPath);
+  // getAudioContentFromStorage(immortalizedPath);
 
   var audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
   var box = await Hive.openBox(playlist);

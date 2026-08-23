@@ -6,7 +6,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:meta/meta.dart';
 
-import 'package:audio_flow/src/configuration/config.dart' show settings, AudioStatus;
+import 'package:audio_flow/src/configuration/config.dart' show settings, AudioStatus, RepeatStatus;
 import 'package:audio_flow/src/instruments/audio_player.dart' show player;
 
 part 'audio_player_event.dart';
@@ -14,7 +14,7 @@ part 'audio_player_state.dart';
 
 class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
   AudioPlayerBloc() : super(AudioPlayerInitial()) {
-    on<AudioPlayerPlayEvent>(_onAudioPlayerEvent, transformer: restartable());
+    on<AudioPlayerPlayEvent>(_onAudioPlayerPlayEvent, transformer: restartable());
     on<AudioPlayerPauseEvent>(_onAudioPauseEvent, transformer: restartable());
     on<AudioPlayerResumeEvent>(_onAudioResumeEvent, transformer: restartable());
     on<AudioPlayerNextEvent>(_onAudioNextEvent, transformer: restartable());
@@ -22,7 +22,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     on<AudioPlayerStopEvent>(_onAudioStopEvent, transformer: restartable());
   }
 
-  void _onAudioPlayerEvent(
+  void _onAudioPlayerPlayEvent(
     AudioPlayerPlayEvent event,
     Emitter<AudioPlayerState> emit,
   ) {
@@ -64,6 +64,8 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     Emitter<AudioPlayerState> emit,
   ) {
     if (settings.isRandom == true) {
+      logger.log.d('AudioPlayerNextEvent with Random == true');
+      logger.logNS.d('settings.isRandom = ${settings.isRandom}');
       setRandomTrack();
       return;
     }

@@ -31,10 +31,10 @@ class AudioFlowBottomBar extends StatelessWidget
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Opacity(
-                  opacity: state.isRandom ? 0.25 : 1.0,
+                  opacity: state.isRandom ? 1.0 : 0.25,
                   child: IconButton(
                     icon: const Icon(Icons.call_split),
-                    tooltip: 'Random',
+                    tooltip: 'Random mode',
                     onPressed: () {
                       bottomBarBloc.add(BottomBarRandomChanged());
                       ScaffoldMessenger.of(context).clearSnackBars();
@@ -44,7 +44,7 @@ class AudioFlowBottomBar extends StatelessWidget
                             alpha: 0.3,
                           ),
                           content: Text(
-                            'Random ${settings.isRandom ? 'on' : 'off'}',
+                            'Random ${settings.isRandom ? 'off' : 'on'}', // TODO: WTF reverse logic?!
                             textAlign: .center,
                           ),
                           duration: Duration(
@@ -52,30 +52,34 @@ class AudioFlowBottomBar extends StatelessWidget
                           ), // Controls display timeframe
                         ),
                       );
-                      logger.log.d('Random is ${settings.isRandom}');
+                      logger.log.d('Random is ${state.isRandom}');
                     },
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.skip_previous),
+                  tooltip: 'Previous track',
                   onPressed: () {
                     audioPlayerBloc.add(AudioPlayerPreviousEvent());
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.stop),
+                  tooltip: 'Stop',
                   onPressed: () {
                     audioPlayerBloc.add(AudioPlayerStopEvent());
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.skip_next),
+                  tooltip: 'Next track',
                   onPressed: () {
                     audioPlayerBloc.add(AudioPlayerNextEvent());
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.repeat),
+                  tooltip: 'Repeat mode',
                   onPressed: () {
                     settings.changeRepeatMode();
                     ScaffoldMessenger.of(context).clearSnackBars();

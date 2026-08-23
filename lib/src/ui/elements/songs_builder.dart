@@ -134,7 +134,7 @@ class SongTile extends StatelessWidget {
   }
 
   void scrollToSelected(int index) {
-    index = index == -1 ? 0 : index;
+    index = index < 0 ? 0 : index;
     if (scrollController.hasClients) {
       scrollController.animateTo(
         extent * index,
