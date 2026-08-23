@@ -9,7 +9,7 @@ sealed class AudioPlayerState {
 }
 
 final class AudioPlayerInitial extends AudioPlayerState {
-  const AudioPlayerInitial() : super(-1);
+  AudioPlayerInitial() : super(settings.currentTrackNumber);
 }
 final class AudioPlayerPlaying extends AudioPlayerState {
   AudioPlayerPlaying() : super(settings.currentTrackNumber);

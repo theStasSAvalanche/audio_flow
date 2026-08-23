@@ -108,7 +108,9 @@ class SongTile extends StatelessWidget {
         return previous != current || current is AudioPlayerPlaying;
       },
       builder: (context, state) {
-        scrollToSelected(settings.currentTrackNumber);
+        if (index == settings.currentTrackNumber) {
+          scrollToSelected(index);
+        }
         return ListTile(
           key: ValueKey(song.filePath),
           title: Text(song.toString()),
