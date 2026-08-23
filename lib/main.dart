@@ -9,6 +9,7 @@ import 'package:audio_flow/src/ui/basic_material_app.dart' show AudioFlowApp;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Settings.initSettings();
+  // settings.clearAllSettings();
   await initLogger();
   await Hive.initFlutter();
   Hive.registerAdapters();

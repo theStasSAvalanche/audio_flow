@@ -1,3 +1,4 @@
+import 'package:audio_flow/src/bloc/bottom_bar_bloc.dart';
 import 'package:audio_flow/src/bloc/permission_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,9 +10,9 @@ import 'package:audio_flow/src/configuration/config.dart'
 import 'package:audio_flow/src/configuration/logger.dart';
 import 'package:audio_flow/src/ui/theme.dart' show darkTheme, lightTheme;
 import 'package:audio_flow/src/ui/routes/main_page.dart' show MainPage;
-import 'package:audio_flow/src/ui/app_bar.dart' show AudioFlowAppBar;
-import 'package:audio_flow/src/ui/bottom_bar.dart' show AudioFlowBottomBar;
-import 'package:audio_flow/src/ui/left_drawer.dart' show AudioFlowDrawer;
+import 'package:audio_flow/src/ui/elements/app_bar.dart' show AudioFlowAppBar;
+import 'package:audio_flow/src/ui/elements/bottom_bar.dart' show AudioFlowBottomBar;
+import 'package:audio_flow/src/ui/elements/left_drawer.dart' show AudioFlowDrawer;
 import 'package:permission_handler/permission_handler.dart';
 
 class AudioFlowApp extends StatelessWidget {
@@ -31,11 +32,13 @@ class AudioFlowMaterial extends StatelessWidget {
     logger.log.d('Start building MaterialApp widget');
     final themeBloc = ThemeBloc();
     final audioPlayerBloc = AudioPlayerBloc();
+    final bottomBarBloc = BottomBarBloc();
 
     return MultiBlocProvider(
       providers: [
         BlocProvider<ThemeBloc>(create: (context) => themeBloc),
         BlocProvider<AudioPlayerBloc>(create: (context) => audioPlayerBloc),
+        BlocProvider<BottomBarBloc>(create: (context) => bottomBarBloc),
       ],
       child: BlocBuilder<ThemeBloc, ThemeMode>(
         bloc: themeBloc,
@@ -79,6 +82,7 @@ class AudioFlowMaterial extends StatelessWidget {
               drawer: AudioFlowDrawer(),
               bottomNavigationBar: AudioFlowBottomBar(
                 audioPlayerBloc: audioPlayerBloc,
+                bottomBarBloc: bottomBarBloc,
               ),
               floatingActionButtonLocation: .centerDocked,
               floatingActionButton: FloatingActionButton(

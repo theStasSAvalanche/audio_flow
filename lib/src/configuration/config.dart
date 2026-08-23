@@ -10,6 +10,12 @@ enum AudioStatus {
   paused,
 }
 
+enum RepeatStatus {
+  off,
+  all,
+  one,
+}
+
 class Settings {
   static final Settings _instance = Settings._internal();
 
@@ -37,7 +43,7 @@ class Settings {
   var isAudioFilesPermissionGranted = _prefs.getBool('isAudioFilesPermissionGranted') ?? false;
   var currentTrackNumber = _prefs.getInt('currentTrackNumber') ?? -1;
   var isRandom = _prefs.getBool('isRandom') ?? false;
-  var isRepeat = _prefs.getBool('isRepeat') ?? false;
+  var repeatMode = getRepeatStatus(_prefs.getString('repeatMode'));
 
   // Additional structures
   late List<AudioFlowFile> audioPlaylist;
@@ -66,8 +72,15 @@ class Settings {
   }
 
   void changeRepeatMode() {
-    settings.isRepeat = !settings.isRepeat;
-    _prefs.setBool('isRepeat', settings.isRepeat);
+    switch (repeatMode) {
+      case RepeatStatus.off:
+        repeatMode = RepeatStatus.all;
+      case RepeatStatus.all:
+        repeatMode = RepeatStatus.one;
+      case RepeatStatus.one:
+        repeatMode = RepeatStatus.off;
+    }
+    _prefs.setString('isRepeat', settings.repeatMode.name);
   }
 
   void dispose() {
@@ -78,7 +91,7 @@ class Settings {
     _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
     _prefs.setInt('currentTrackNumber', settings.currentTrackNumber);
     _prefs.setBool('isRandom', settings.isRandom);
-    _prefs.setBool('isRepeat', settings.isRepeat);
+    _prefs.setString('isRepeat', settings.repeatMode.name);
   }
 }
 
@@ -113,6 +126,20 @@ AudioStatus getPlayerStatus(String? status) {
     case _:
       return AudioStatus.initial;
   }
+}
+
+RepeatStatus getRepeatStatus(String? status) {
+  switch (status) {
+    case 'all':
+      return RepeatStatus.all;
+    case 'one':
+      return RepeatStatus.one;
+    case 'standart':
+    case '_':
+      return RepeatStatus.off;
+  }
+
+  return RepeatStatus.off;
 }
 
 final settings = Settings();
