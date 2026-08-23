@@ -35,7 +35,7 @@ class Settings {
   ThemeMode themeMode = _prefs.getString('themeMode') == 'dark' ? ThemeMode.dark : ThemeMode.light;
   AudioStatus playerStatus = AudioStatus.initial;
   var isAudioFilesPermissionGranted = _prefs.getBool('isAudioFilesPermissionGranted') ?? false;
-  var currentTrack = _prefs.getInt('currentTrack') ?? -1;
+  var currentTrackNumber = _prefs.getInt('currentTrackNumber') ?? -1;
   var isRandom = _prefs.getBool('isRandom') ?? false;
   var isRepeat = _prefs.getBool('isRepeat') ?? false;
 
@@ -55,9 +55,9 @@ class Settings {
     playerStatus = newStatus;
   }
 
-  void setCurrentTrack(int trackNumber) {
-    settings.currentTrack = trackNumber;
-    _prefs.setInt('currentTrack', trackNumber);
+  void setCurrentTrackNumber(int trackNumber) {
+    settings.currentTrackNumber = trackNumber;
+    _prefs.setInt('currentTrackNumber', trackNumber);
   }
 
   void changeRandomMode() {
@@ -76,7 +76,7 @@ class Settings {
     _prefs.setString('logFileName', logFileName);
     _prefs.setString('themeMode', themeMode.name);
     _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
-    _prefs.setInt('currentTrack', settings.currentTrack);
+    _prefs.setInt('currentTrackNumber', settings.currentTrackNumber);
     _prefs.setBool('isRandom', settings.isRandom);
     _prefs.setBool('isRepeat', settings.isRepeat);
   }

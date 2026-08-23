@@ -28,10 +28,9 @@ class AudioFlowFile {
   @override
   String toString() {
     var buffer = StringBuffer();
-    // TODO: uncomment next time
-    // if (artist != null) {
-    //   buffer.write('$artist - ');
-    // }
+    if (artist != null) {
+      buffer.write('$artist - ');
+    }
     // if (album != null) {
     //   buffer.write('$album - ');
     // }

@@ -83,11 +83,14 @@ class AudioFlowMaterial extends StatelessWidget {
               floatingActionButtonLocation: .centerDocked,
               floatingActionButton: FloatingActionButton(
                 onPressed: () {
-                  if (settings.playerStatus == AudioStatus.initial || settings.playerStatus == AudioStatus.paused) {
-                    audioPlayerBloc.add(AudioPlayerPlayEvent(null));
+                  if (settings.playerStatus == AudioStatus.initial) {
+                    audioPlayerBloc.add(AudioPlayerPlayEvent(settings.currentTrackNumber));
                   }
                   else if (settings.playerStatus == AudioStatus.playing) {
                     audioPlayerBloc.add(AudioPlayerPauseEvent());
+                  }
+                  else if (settings.playerStatus == AudioStatus.paused) {
+                    audioPlayerBloc.add(AudioPlayerResumeEvent());
                   }
                 },
                 tooltip: 'Play/Pause',
