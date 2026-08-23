@@ -29,11 +29,11 @@ class SongsList extends StatelessWidget {
           logger.logNS.d('Audio builder in process: snapshot has data');
           logger.logNS.d('Returning ListView.builder');
           settings.audioPlaylist = snapshot.data!;
-          final List<GlobalKey> _keys = List.generate(snapshot.data!.length, (index) => GlobalKey());
+          final ScrollController scrollController = ScrollController();
           return MyHookField(
             snapshot: snapshot,
             audioPlayerBloc: audioPlayerBloc,
-            keys: _keys,
+            scrollController: scrollController,
           );
         } else {
           // Если данных нет, показываем сообщение об этом
@@ -44,25 +44,34 @@ class SongsList extends StatelessWidget {
   }
 }
 
-
 class SongsListView extends StatelessWidget {
   final AsyncSnapshot<List<AudioFlowFile>> snapshot;
   final AudioPlayerBloc audioPlayerBloc;
-  final List<GlobalKey> keys;
+  final ScrollController scrollController;
   const SongsListView({
     super.key,
     required this.snapshot,
     required this.audioPlayerBloc,
-    required this.keys,
+    required this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.sizeOf(context).height;
+    double tileExtent = screenHeight * 0.06;
     return ListView.custom(
+      itemExtent: tileExtent * 1.0,
+      controller: scrollController,
       childrenDelegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           final song = snapshot.data![index];
-          return SongTile(audioPlayerBloc: audioPlayerBloc, song: song, index: index);
+          return SongTile(
+            audioPlayerBloc: audioPlayerBloc,
+            song: song,
+            index: index,
+            extent: tileExtent,
+            scrollController: scrollController,
+          );
         },
         childCount: snapshot.data!.length,
         findChildIndexCallback: (Key key) {
@@ -75,27 +84,21 @@ class SongsListView extends StatelessWidget {
       ),
     );
   }
-
-  double getTilePosition(int index) {
-  final context = keys[0].currentContext;
-  if (context != null) {
-    final renderBox = context.findRenderObject() as RenderBox;
-    return renderBox.size.height * index; // Возвращает точную высоту в double
-  }
-  return 0.0; // Элемент еще не отрендерен (находится за пределами экрана)
 }
-}
-
 
 class SongTile extends StatelessWidget {
   final AudioPlayerBloc audioPlayerBloc;
   final AudioFlowFile song;
   final int index;
+  final double extent;
+  final ScrollController scrollController;
   const SongTile({
     super.key,
     required this.audioPlayerBloc,
     required this.song,
     required this.index,
+    required this.extent,
+    required this.scrollController,
   });
 
   @override
@@ -105,6 +108,7 @@ class SongTile extends StatelessWidget {
         return previous != current || current is AudioPlayerPlaying;
       },
       builder: (context, state) {
+        scrollToSelected(settings.currentTrackNumber);
         return ListTile(
           key: ValueKey(song.filePath),
           title: Text(song.toString()),
@@ -126,17 +130,28 @@ class SongTile extends StatelessWidget {
       },
     );
   }
+
+  void scrollToSelected(int index) {
+    index = index == -1 ? 0 : index;
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        extent * index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
 }
 
 class MyHookField extends HookWidget {
   final AsyncSnapshot<List<AudioFlowFile>> snapshot;
   final AudioPlayerBloc audioPlayerBloc;
-  final List<GlobalKey> keys;
+  final ScrollController scrollController;
   const MyHookField({
     super.key,
     required this.snapshot,
     required this.audioPlayerBloc,
-    required this.keys,
+    required this.scrollController,
   });
 
   @override
@@ -144,7 +159,7 @@ class MyHookField extends HookWidget {
     return SongsListView(
       snapshot: snapshot,
       audioPlayerBloc: audioPlayerBloc,
-      keys: keys,
+      scrollController: scrollController,
     );
   }
 }
