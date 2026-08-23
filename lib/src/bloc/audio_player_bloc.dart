@@ -43,7 +43,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerPauseEvent event,
     Emitter<AudioPlayerState> emit,
   ) {
-    if (settings.playerStatus == AudioStatus.playing) {
+    if (state is AudioPlayerPlaying) {
       settings.setPlayerStatus(AudioStatus.paused);
       player.audioPlayer.pause();
       emit(AudioPlayerPaused());
@@ -54,6 +54,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerResumeEvent event,
     Emitter<AudioPlayerState> emit,
   ) {
+    settings.setPlayerStatus(AudioStatus.playing);
     player.audioPlayer.resume();
     emit(AudioPlayerPlaying());
   }
