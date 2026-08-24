@@ -81,10 +81,10 @@ class AudioFlowBottomBar extends StatelessWidget
                     Builder(
                       builder: (context) {
                         if (state.repeatMode == RepeatStatus.one) {
-                          return Text('1');   
+                          return const Text('1');   
                         }
 
-                        return Text('');
+                        return const Text('');
                       },
                     ),
                   ],
