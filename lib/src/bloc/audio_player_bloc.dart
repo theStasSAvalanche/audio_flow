@@ -29,10 +29,10 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     on<AudioPlayerStopEvent>(_onAudioStopEvent, transformer: restartable());
   }
 
-  void _onAudioPlayerPlayEvent(
+  Future<void> _onAudioPlayerPlayEvent(
     AudioPlayerPlayEvent event,
     Emitter<AudioPlayerState> emit,
-  ) {
+  ) async {
     var index = event.trackNumber ?? settings.currentTrackNumber;
 
     if (index < 0 || index > settings.audioPlaylist.length) {
@@ -42,6 +42,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     logger.log.d('Now playing: ${settings.audioPlaylist[index].toString()}');
     settings.setCurrentTrackNumber(index);
     settings.setPlayerStatus(AudioStatus.playing);
+    await player.audioPlayer.stop();
     player.audioPlayer.play(
       DeviceFileSource(settings.audioPlaylist[index].filePath),
     );
@@ -79,30 +80,36 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     }
 
     if (settings.isRandom == true) {
-      logger.log.d('AudioPlayerNextEvent with Random == true');
-      logger.logNS.d('settings.isRandom = ${settings.isRandom}');
       setRandomTrack();
       return;
     }
-
-    var nextTrack = 0;
 
     if (settings.repeatMode == RepeatStatus.off &&
         settings.currentTrackNumber == settings.audioPlaylist.length - 1) {
       return;
-    } else {  // RepeatStatus.all
-      nextTrack = (settings.currentTrackNumber + 1) % settings.audioPlaylist.length;
     }
-
+    
+    var nextTrack = (settings.currentTrackNumber + 1) % settings.audioPlaylist.length;
     playFromIndex(nextTrack);
   }
 
-  void _onAudioPreviousEvent(
+  Future<void> _onAudioPreviousEvent(
     AudioPlayerPreviousEvent event,
     Emitter<AudioPlayerState> emit,
-  ) {
+  ) async {
+    if (settings.repeatMode == RepeatStatus.one) {
+      await player.audioPlayer.stop();
+      playFromIndex(settings.currentTrackNumber);
+      return;
+    }
+
     if (settings.isRandom == true) {
       setRandomTrack();
+      return;
+    }
+    
+    if (settings.repeatMode == RepeatStatus.off &&
+        settings.currentTrackNumber == 0) {
       return;
     }
 
@@ -116,13 +123,13 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     playFromIndex(nextTrack);
   }
 
-  void _onAudioStopEvent(
+  Future<void> _onAudioStopEvent(
     AudioPlayerStopEvent event,
     Emitter<AudioPlayerState> emit,
-  ) {
+  ) async {
     settings.setCurrentTrackNumber(-1);
     settings.setPlayerStatus(AudioStatus.initial);
-    player.audioPlayer.stop();
+    await player.audioPlayer.stop();
     emit(AudioPlayerInitial());
   }
 
