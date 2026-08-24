@@ -44,7 +44,7 @@ class AudioFlowBottomBar extends StatelessWidget
                             alpha: 0.3,
                           ),
                           content: Text(
-                            'Random ${settings.isRandom ? 'off' : 'on'}', // TODO: WTF reverse logic?!
+                            'Random ${state.isRandom ? 'off' : 'on'}', // WTF reverse logic?!
                             textAlign: .center,
                           ),
                           duration: Duration(
