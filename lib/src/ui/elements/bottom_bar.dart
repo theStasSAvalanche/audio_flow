@@ -37,21 +37,6 @@ class AudioFlowBottomBar extends StatelessWidget
                     tooltip: 'Random mode',
                     onPressed: () {
                       bottomBarBloc.add(BottomBarRandomChanged());
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.lightBlue.withValues(
-                            alpha: 0.3,
-                          ),
-                          content: Text(
-                            'Random ${state.isRandom ? 'off' : 'on'}', // WTF reverse logic?!
-                            textAlign: .center,
-                          ),
-                          duration: Duration(
-                            seconds: 2,
-                          ), // Controls display timeframe
-                        ),
-                      );
                       logger.log.d('Random is ${state.isRandom}');
                     },
                   ),
@@ -77,30 +62,32 @@ class AudioFlowBottomBar extends StatelessWidget
                     audioPlayerBloc.add(AudioPlayerNextEvent());
                   },
                 ),
-                IconButton(
-                  icon: const Icon(Icons.repeat),
-                  tooltip: 'Repeat mode',
-                  onPressed: () {
-                    settings.changeRepeatMode();
-                    ScaffoldMessenger.of(context).clearSnackBars();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.lightBlue.withValues(
-                          alpha: 0.3,
-                        ),
-                        content: Text(
-                          'Repeat ${settings.repeatMode.name}',
-                          textAlign: .center,
-                        ),
-                        duration: Duration(
-                          seconds: 2,
-                        ), // Controls display timeframe
+                Stack(
+                  alignment: .topRight,
+                  children: [
+                    Opacity(
+                      opacity: state.repeatMode == RepeatStatus.off ? 0.25 : 1.0,
+                      child: IconButton(
+                        icon: const Icon(Icons.repeat),
+                        tooltip: 'Repeat mode',
+                        onPressed: () {
+                          bottomBarBloc.add(BottomBarRepeatChanged());
+                          logger.log.d(
+                            'Repeat mode set to ${settings.repeatMode.name}',
+                          );
+                        },
                       ),
-                    );
-                    logger.log.d(
-                      'Repeat mode set to ${settings.repeatMode.name}',
-                    );
-                  },
+                    ),
+                    Builder(
+                      builder: (context) {
+                        if (state.repeatMode == RepeatStatus.one) {
+                          return Text('1');   
+                        }
+
+                        return Text('');
+                      },
+                    ),
+                  ],
                 ),
               ],
             );
