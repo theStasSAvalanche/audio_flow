@@ -86,6 +86,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
 
     if (settings.repeatMode == RepeatStatus.off &&
         settings.currentTrackNumber == settings.audioPlaylist.length - 1) {
+      await player.audioPlayer.stop();
       return;
     }
     
@@ -110,6 +111,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     
     if (settings.repeatMode == RepeatStatus.off &&
         settings.currentTrackNumber == 0) {
+      await player.audioPlayer.stop();
       return;
     }
 
