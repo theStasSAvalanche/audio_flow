@@ -6,15 +6,18 @@ import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/instruments/hive_audio_database.dart'
     show getPlaylistFromHive;
+import 'package:flutter/rendering.dart' show RenderAbstractViewport;
 import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder;
 
-class SongsList extends StatelessWidget {
+class SongsListBuilder extends StatelessWidget {
   final AudioPlayerBloc audioPlayerBloc;
   final ScrollController scrollController;
-  const SongsList({
+  final double headerHeight;
+  const SongsListBuilder({
     super.key,
     required this.audioPlayerBloc,
     required this.scrollController,
+    required this.headerHeight,
   });
 
   @override
@@ -41,6 +44,7 @@ class SongsList extends StatelessWidget {
             snapshot: snapshot,
             audioPlayerBloc: audioPlayerBloc,
             scrollController: scrollController,
+            headerHeight: headerHeight,
           );
         } else {
           // Если данных нет, показываем сообщение об этом
@@ -55,11 +59,13 @@ class SongsListView extends StatelessWidget {
   final AsyncSnapshot<List<AudioFlowFile>> snapshot;
   final AudioPlayerBloc audioPlayerBloc;
   final ScrollController scrollController;
+  final double headerHeight;
   const SongsListView({
     super.key,
     required this.snapshot,
     required this.audioPlayerBloc,
     required this.scrollController,
+    required this.headerHeight,
   });
 
   @override
@@ -68,20 +74,17 @@ class SongsListView extends StatelessWidget {
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           final song = snapshot.data![index];
+          final List<GlobalKey> targetSliverKey = List<GlobalKey>.generate(snapshot.data!.length, (_) => GlobalKey());
           return SongTile(
             audioPlayerBloc: audioPlayerBloc,
             song: song,
             index: index,
+            tileKey: targetSliverKey[index],
+            scrollController: scrollController,
+            headerHeight: headerHeight,
           );
         },
         childCount: snapshot.data!.length,
-        findChildIndexCallback: (Key key) {
-          final ValueKey targetKey = key as ValueKey;
-          final index = snapshot.data!.indexWhere(
-            (song) => ValueKey(song.filePath) == targetKey,
-          );
-          return index >= 0 ? index : null;
-        },
       ),
     );
   }
@@ -91,11 +94,17 @@ class SongTile extends StatelessWidget {
   final AudioPlayerBloc audioPlayerBloc;
   final AudioFlowFile song;
   final int index;
+  final GlobalKey tileKey; 
+  final ScrollController scrollController;
+  final double headerHeight;
   const SongTile({
     super.key,
     required this.audioPlayerBloc,
     required this.song,
     required this.index,
+    required this.tileKey,
+    required this.scrollController,
+    required this.headerHeight,
   });
 
   @override
@@ -105,8 +114,11 @@ class SongTile extends StatelessWidget {
         return previous != current || current is AudioPlayerPlaying;
       },
       builder: (context, state) {
+        if (index == state.trackNumber) {
+          scrollToSliver(tileKey);
+        }
         return ListTile(
-          key: ValueKey(song.filePath),
+          key: tileKey,
           title: Text(song.toString()),
           selectedTileColor: Colors.lightBlue.withValues(alpha: 0.3),
           selected: index == state.trackNumber,
@@ -125,5 +137,29 @@ class SongTile extends StatelessWidget {
         );
       },
     );
+  }
+
+  void scrollToSliver(GlobalKey key) {
+    final context = key.currentContext;
+    if (context != null) {
+      // Находим RenderBox нужного слейвера
+      final RenderBox renderBox = context.findRenderObject() as RenderBox;
+      
+      // Получаем позицию слейвера относительно Scrollable-родителя
+      final position = renderBox.localToGlobal(
+        Offset(0, -headerHeight), 
+        ancestor: context.findAncestorRenderObjectOfType<RenderAbstractViewport>(),
+      );
+
+      // Вычисляем итоговый offset с учетом текущей прокрутки
+      final targetOffset = scrollController.offset + position.dy;
+
+      // Плавно скроллим
+      scrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 }
