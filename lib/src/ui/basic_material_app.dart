@@ -9,10 +9,13 @@ import 'package:audio_flow/src/configuration/config.dart'
     show AudioStatus, settings;
 import 'package:audio_flow/src/configuration/logger.dart';
 import 'package:audio_flow/src/ui/theme.dart' show darkTheme, lightTheme;
-import 'package:audio_flow/src/ui/routes/main_page.dart' show MainPage;
+import 'package:audio_flow/src/ui/routes/main_page.dart'
+    show AudioFlowScrollController;
 import 'package:audio_flow/src/ui/elements/app_bar.dart' show AudioFlowAppBar;
-import 'package:audio_flow/src/ui/elements/bottom_bar.dart' show AudioFlowBottomBar;
-import 'package:audio_flow/src/ui/elements/left_drawer.dart' show AudioFlowDrawer;
+import 'package:audio_flow/src/ui/elements/bottom_bar.dart'
+    show AudioFlowBottomBar;
+import 'package:audio_flow/src/ui/elements/left_drawer.dart'
+    show AudioFlowDrawer;
 import 'package:permission_handler/permission_handler.dart';
 
 class AudioFlowApp extends StatelessWidget {
@@ -56,9 +59,15 @@ class AudioFlowMaterial extends StatelessWidget {
                   child: BlocBuilder<PermissionBloc, PermissionState>(
                     builder: (context, state) {
                       if (state is PermissionGranted) {
+                        // Next Widgets chain associated with songs list builder
                         settings.isAudioFilesPermissionGranted = true;
-                        return MainPage(audioPlayerBloc: audioPlayerBloc);
-                      } else if (state is PermissionDenied) {
+                        return AudioFlowScrollController(
+                          audioPlayerBloc: audioPlayerBloc,
+                          scrollController: ScrollController(),
+                        );
+                      }
+                      
+                      else if (state is PermissionDenied) {
                         return Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -79,7 +88,7 @@ class AudioFlowMaterial extends StatelessWidget {
                   ),
                 ),
               ),
-              drawer: AudioFlowDrawer(),
+              drawer: AudioFlowDrawer(), // Left-sided menu
               bottomNavigationBar: AudioFlowBottomBar(
                 audioPlayerBloc: audioPlayerBloc,
                 bottomBarBloc: bottomBarBloc,
@@ -88,12 +97,12 @@ class AudioFlowMaterial extends StatelessWidget {
               floatingActionButton: FloatingActionButton(
                 onPressed: () {
                   if (settings.playerStatus == AudioStatus.initial) {
-                    audioPlayerBloc.add(AudioPlayerPlayEvent(settings.currentTrackNumber));
-                  }
-                  else if (settings.playerStatus == AudioStatus.playing) {
+                    audioPlayerBloc.add(
+                      AudioPlayerPlayEvent(settings.currentTrackNumber),
+                    );
+                  } else if (settings.playerStatus == AudioStatus.playing) {
                     audioPlayerBloc.add(AudioPlayerPauseEvent());
-                  }
-                  else if (settings.playerStatus == AudioStatus.paused) {
+                  } else if (settings.playerStatus == AudioStatus.paused) {
                     audioPlayerBloc.add(AudioPlayerResumeEvent());
                   }
                 },
@@ -111,7 +120,8 @@ class AudioFlowMaterial extends StatelessWidget {
               ),
             ),
           );
-        }),
+        },
+      ),
     );
   }
 }
