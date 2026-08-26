@@ -73,6 +73,10 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerNextEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
+    if (state is AudioPlayerInitial) {
+      return;
+    }
+    
     if (settings.repeatMode == RepeatStatus.one) {
       await player.audioPlayer.stop();
       playFromIndex(settings.currentTrackNumber);
@@ -87,6 +91,9 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     if (settings.repeatMode == RepeatStatus.off &&
         settings.currentTrackNumber == settings.audioPlaylist.length - 1) {
       await player.audioPlayer.stop();
+      settings.setCurrentTrackNumber(-1);
+      settings.setPlayerStatus(AudioStatus.initial);
+      emit(AudioPlayerInitial());
       return;
     }
     
@@ -98,6 +105,10 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerPreviousEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
+    if (state is AudioPlayerInitial) {
+      return;
+    }
+
     if (settings.repeatMode == RepeatStatus.one) {
       await player.audioPlayer.stop();
       playFromIndex(settings.currentTrackNumber);
@@ -112,6 +123,9 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     if (settings.repeatMode == RepeatStatus.off &&
         settings.currentTrackNumber == 0) {
       await player.audioPlayer.stop();
+      settings.setCurrentTrackNumber(-1);
+      settings.setPlayerStatus(AudioStatus.initial);
+      emit(AudioPlayerInitial());
       return;
     }
 
@@ -129,9 +143,9 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerStopEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
+    await player.audioPlayer.stop();
     settings.setCurrentTrackNumber(-1);
     settings.setPlayerStatus(AudioStatus.initial);
-    await player.audioPlayer.stop();
     emit(AudioPlayerInitial());
   }
 
