@@ -1,10 +1,13 @@
 import 'dart:io' show File;
 
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
+import 'package:audio_flow/src/ui/elements/playlists_top_menu.dart'
+    show PlayListMenu;
 import 'package:flutter/material.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
-import 'package:audio_flow/src/ui/elements/songs_builder.dart' show SongsListBuilder;
+import 'package:audio_flow/src/ui/elements/songs_builder.dart'
+    show SongsListBuilder;
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
 
 class MainPage extends StatelessWidget {
@@ -29,13 +32,17 @@ class MainPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: .start,
         crossAxisAlignment: .center,
-        children: [          
+        children: [
           SizedBox(
-            height: headerHeight * 0.8,
+            height: headerHeight * 0.65,
             child: Row(
               // Album picture
               children: [
-                Image.file(File('/storage/emulated/0/Music/Disturbed/Albums/2015 - Immortalized/cover.jpg')),
+                Image.file(
+                  File(
+                    '/storage/emulated/0/Music/Disturbed/Albums/2015 - Immortalized/cover.jpg',
+                  ),
+                ),
               ],
             ),
           ),
@@ -47,13 +54,15 @@ class MainPage extends StatelessWidget {
               children: [
                 Text(
                   '02. Immortalized',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: .w700
-                  ),
+                  style: TextStyle(fontSize: 18.0, fontWeight: .w700),
                 ),
               ],
             ),
+          ),
+          // SizedBox(height: headerHeight * 0.025),
+          SizedBox(
+            height: headerHeight * 0.15,
+            child: PlayListMenu(headerHeight: headerHeight),
           ),
           Expanded(
             child: CustomScrollView(
@@ -90,62 +99,5 @@ class AudioFlowScrollController extends HookWidget {
       audioPlayerBloc: audioPlayerBloc,
       scrollController: scrollController,
     );
-  }
-}
-
-
-class MainPageHeader extends SliverPersistentHeaderDelegate {
-  final double headerHeight;
-
-  const MainPageHeader({
-    required this.headerHeight,
-  });
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Column(
-        mainAxisAlignment: .start,
-        crossAxisAlignment: .center,
-        children: [
-          SizedBox(
-            height: headerHeight * 0.8,
-            child: Row(
-              // Album picture
-              children: [
-                Image.file(File('/storage/emulated/0/Music/Disturbed/Albums/2015 - Immortalized/cover.jpg')),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: headerHeight * 0.05, 
-          ),
-          Row(
-            // Current song name
-            children: [
-              SizedBox(
-                height: headerHeight * 0.15,
-                child: Text(
-                  '02. Immortalized',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: .w700
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
-  }
-  
-  @override
-  double get minExtent => headerHeight;
-
-  @override
-  double get maxExtent => headerHeight;
-
-  @override
-  bool shouldRebuild(covariant MainPageHeader oldDelegate) {
-    return oldDelegate.headerHeight != headerHeight;
   }
 }

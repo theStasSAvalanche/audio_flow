@@ -15,10 +15,13 @@ Future<List<AudioFlowFile>> getPlaylistFromHive(
   String playlist,
 ) async {
   logger.log.d('Get playlist with name: $playlist from Hive');
-  getAudioContentFromStorage(immortalizedPath);
-
   var audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
   var box = await Hive.openBox(playlist);
+  if (box.isEmpty) {
+    audioDatabase = await getAudioContentFromStorage(immortalizedPath);
+    savePlaylistToHive(playlist, audioDatabase);
+  }
+
   for (var key in box.keys) {
     audioDatabase[key] = List<AudioFlowFile>.from(box.get(key));
     // audioDatabase[key]!.sort((a, b) => a.compareTo(b));

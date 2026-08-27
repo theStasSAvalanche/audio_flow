@@ -7,7 +7,7 @@ import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/instruments/hive_audio_database.dart'
     show savePlaylistToHive;
 
-Future<void> getAudioContentFromStorage(String folder) async {
+Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromStorage(String folder) async {
   logger.log.d('Get audio content started');
 
   final audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
@@ -33,7 +33,7 @@ Future<void> getAudioContentFromStorage(String folder) async {
   }
   logger.log.d('Tracks found: audioContent');
 
-  savePlaylistToHive('playlist', audioDatabase);
+  return audioDatabase;
 }
 
 Future<AudioMetadata> readMp3Tags(File file) async {
