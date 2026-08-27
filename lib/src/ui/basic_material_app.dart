@@ -1,5 +1,7 @@
 import 'package:audio_flow/src/bloc/bottom_bar_bloc.dart';
 import 'package:audio_flow/src/bloc/permission_bloc.dart';
+import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
+import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -36,12 +38,16 @@ class AudioFlowMaterial extends StatelessWidget {
     final themeBloc = ThemeBloc();
     final audioPlayerBloc = AudioPlayerBloc();
     final bottomBarBloc = BottomBarBloc();
+    final playlistFilesBloc = PlaylistFilesBloc();
+    final playlistNameBloc = PlaylistNameBloc();
 
     return MultiBlocProvider(
       providers: [
         BlocProvider<ThemeBloc>(create: (context) => themeBloc),
         BlocProvider<AudioPlayerBloc>(create: (context) => audioPlayerBloc),
         BlocProvider<BottomBarBloc>(create: (context) => bottomBarBloc),
+        BlocProvider<PlaylistFilesBloc>(create: (context) => playlistFilesBloc),
+        BlocProvider<PlaylistNameBloc>(create: (context) => playlistNameBloc),
       ],
       child: BlocBuilder<ThemeBloc, ThemeMode>(
         bloc: themeBloc,
@@ -64,6 +70,8 @@ class AudioFlowMaterial extends StatelessWidget {
                         return AudioFlowScrollController(
                           audioPlayerBloc: audioPlayerBloc,
                           scrollController: ScrollController(),
+                          playlistFilesBloc: playlistFilesBloc,
+                          playlistNameBloc: playlistNameBloc,
                         );
                       }
                       
@@ -88,7 +96,7 @@ class AudioFlowMaterial extends StatelessWidget {
                   ),
                 ),
               ),
-              drawer: AudioFlowDrawer(), // Left-sided menu
+              drawer: AudioFlowDrawer(playlistNameBloc: playlistNameBloc,), // Left-sided menu
               bottomNavigationBar: AudioFlowBottomBar(
                 audioPlayerBloc: audioPlayerBloc,
                 bottomBarBloc: bottomBarBloc,

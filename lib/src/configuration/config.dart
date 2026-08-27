@@ -44,6 +44,7 @@ class Settings {
   var currentTrackNumber = _prefs.getInt('currentTrackNumber') ?? -1;
   var isRandom = _prefs.getBool('isRandom') ?? false;
   var repeatMode = getRepeatStatus(_prefs.getString('repeatMode'));
+  var playlistName = _prefs.getString('playlistName') ?? 'Playlist 1';
 
   // Additional structures
   late List<AudioFlowFile> audioPlaylist;
@@ -83,6 +84,11 @@ class Settings {
     _prefs.setString('isRepeat', settings.repeatMode.name);
   }
 
+  void setPlaylistName(String newPlaylistName) {
+    settings.playlistName = newPlaylistName;
+    _prefs.setString('playlistName', settings.playlistName);
+  }
+
   void dispose() {
     _prefs.setBool('isDebug', isDebug);
     _prefs.setString('logLevel', logLevel.name);
@@ -92,6 +98,7 @@ class Settings {
     _prefs.setInt('currentTrackNumber', settings.currentTrackNumber);
     _prefs.setBool('isRandom', settings.isRandom);
     _prefs.setString('isRepeat', settings.repeatMode.name);
+    _prefs.setString('playlistName', settings.playlistName);
   }
 }
 

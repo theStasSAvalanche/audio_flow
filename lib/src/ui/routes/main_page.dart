@@ -1,22 +1,29 @@
 import 'dart:io' show File;
 
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
+import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
+import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
 import 'package:audio_flow/src/ui/elements/playlists_top_menu.dart'
     show PlayListMenu;
 import 'package:flutter/material.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
-import 'package:audio_flow/src/ui/elements/songs_builder.dart'
+import 'package:audio_flow/src/ui/elements/songs_sliverlist.dart'
     show SongsListBuilder;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
 
 class MainPage extends StatelessWidget {
   final AudioPlayerBloc audioPlayerBloc;
   final ScrollController scrollController;
+  final PlaylistFilesBloc playlistFilesBloc;
+  final PlaylistNameBloc playlistNameBloc;
   const MainPage({
     super.key,
     required this.audioPlayerBloc,
     required this.scrollController,
+    required this.playlistFilesBloc,
+    required this.playlistNameBloc,
   });
 
   @override
@@ -59,10 +66,18 @@ class MainPage extends StatelessWidget {
               ],
             ),
           ),
-          // SizedBox(height: headerHeight * 0.025),
-          SizedBox(
-            height: headerHeight * 0.15,
-            child: PlayListMenu(headerHeight: headerHeight),
+          BlocBuilder<PlaylistFilesBloc, PlaylistFilesState>(
+            bloc: playlistFilesBloc,
+            builder: (context, state) {
+              return SizedBox(
+                height: headerHeight * 0.15,
+                child: PlayListMenu(
+                  headerHeight: headerHeight,
+                  playlistFilesBloc: playlistFilesBloc,
+                  playlistNameBloc: playlistNameBloc,
+                ),
+              );
+            }
           ),
           Expanded(
             child: CustomScrollView(
@@ -71,6 +86,7 @@ class MainPage extends StatelessWidget {
               slivers: [
                 SongsListBuilder(
                   audioPlayerBloc: audioPlayerBloc,
+                  playlistFilesBloc: playlistFilesBloc,
                   scrollController: scrollController,
                   headerHeight: headerHeight,
                 ),
@@ -86,11 +102,15 @@ class MainPage extends StatelessWidget {
 class AudioFlowScrollController extends HookWidget {
   final AudioPlayerBloc audioPlayerBloc;
   final ScrollController scrollController;
+  final PlaylistFilesBloc playlistFilesBloc;
+  final PlaylistNameBloc playlistNameBloc;
 
   const AudioFlowScrollController({
     super.key,
     required this.audioPlayerBloc,
     required this.scrollController,
+    required this.playlistFilesBloc,
+    required this.playlistNameBloc,
   });
 
   @override
@@ -98,6 +118,8 @@ class AudioFlowScrollController extends HookWidget {
     return MainPage(
       audioPlayerBloc: audioPlayerBloc,
       scrollController: scrollController,
+      playlistFilesBloc: playlistFilesBloc,
+      playlistNameBloc: playlistNameBloc,
     );
   }
 }

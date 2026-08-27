@@ -1,8 +1,9 @@
+import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
 import 'package:flutter/material.dart';
 
-
 class AudioFlowDrawer extends StatelessWidget {
-  const AudioFlowDrawer({super.key});
+  final PlaylistNameBloc playlistNameBloc;
+  const AudioFlowDrawer({super.key, required this.playlistNameBloc});
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +30,7 @@ class AudioFlowDrawer extends StatelessWidget {
               // ...
             },
           ),
-          const SizedBox(
-            height: 32.0,
-          ),
+          const SizedBox(height: 32.0),
           const Divider(),
           ListTile(
             title: const Text('Settings'),
