@@ -2,6 +2,7 @@ import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
 import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
+import 'package:audio_flow/src/ui/routes/open_files_and_folders.dart' show OpenFilesAndFolders;
 import 'package:flutter/material.dart';
 
 class PlayListMenu extends StatelessWidget {
@@ -25,21 +26,35 @@ class PlayListMenu extends StatelessWidget {
           children: [
             Text(
               'Playlist 1',
-              style: TextStyle(fontSize: 20.0, fontWeight: .w700),
+              style: TextStyle(fontSize: 18.0, fontWeight: .w500),
             ),
             SizedBox(width: 8),
             Icon(Icons.create_sharp),
             Spacer(),
-            Icon(Icons.add_outlined),
+            IconButton(
+              icon: Icon(Icons.add_outlined),
+              tooltip: 'Add files and folders',
+              onPressed: () {
+                logger.log.d('Add folders to playlist');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (context) => OpenFilesAndFolders(),
+                  ),
+                );
+              },
+            ),
             SizedBox(width: 8),
             IconButton(
               icon: Icon(Icons.playlist_remove),
+              tooltip: 'Clear playlist',
               onPressed: () {
                 logger.log.d('Clear current playlist from audio files');
-                playlistFilesBloc.add(PlaylistFilesClear(playlistName: settings.playlistName));
+                playlistFilesBloc.add(
+                  PlaylistFilesClear(playlistName: settings.playlistName),
+                );
               },
             ),
-            Icon(Icons.close_outlined),
           ],
         ),
       ),

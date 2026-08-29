@@ -11,7 +11,10 @@ final class PlaylistFilesInitial extends PlaylistFilesState {
   const PlaylistFilesInitial() : super(audioPlaylist: const []);
 }
 
+final class PlaylistFilesLoading extends PlaylistFilesState {
+  const PlaylistFilesLoading() : super(audioPlaylist: const []);
+}
+
 final class PlaylistFilesDataExists extends PlaylistFilesState {
-  const PlaylistFilesDataExists(List<AudioFlowFile> audioPlaylist)
-    : super(audioPlaylist: audioPlaylist);
+  const PlaylistFilesDataExists({required super.audioPlaylist});
 }
