@@ -12,7 +12,7 @@ class PlaylistFilesBloc extends Bloc<PlaylistFilesEvent, PlaylistFilesState> {
   PlaylistFilesBloc() : super(PlaylistFilesInitial()) {
     on<PlaylistFilesFromHive>(_onPlaylistFilesFromHive);
     on<PlaylistFilesOpen>(_onPlaylistFilesOpen);
-    on<PlaylistFoldersOpen>(_onPlaylistFoldersOpen);
+    on<PlaylistFolderOpen>(_onPlaylistFoldersOpen);
     on<PlaylistFilesClear>(_onPlaylistFilesClear);
   }
 
@@ -30,13 +30,13 @@ class PlaylistFilesBloc extends Bloc<PlaylistFilesEvent, PlaylistFilesState> {
     Emitter<PlaylistFilesState> emit,
   ) async {
     var audioPlaylist = settings.audioPlaylist;
-    // TODO: implement
+    // TODO: implement final String folderPath;
 
     emit(PlaylistFilesDataExists(audioPlaylist: audioPlaylist));
   }
 
   Future<void> _onPlaylistFoldersOpen(
-    PlaylistFoldersOpen event,
+    PlaylistFolderOpen event,
     Emitter<PlaylistFilesState> emit,
   ) async {
     emit(PlaylistFilesLoading());

@@ -9,10 +9,10 @@ class PlaylistFilesFromHive extends PlaylistFilesEvent {
   PlaylistFilesFromHive({required this.playlistName});
 }
 class PlaylistFilesOpen extends PlaylistFilesEvent {}
-class PlaylistFoldersOpen extends PlaylistFilesEvent {
-  final List<String> folderPaths;
+class PlaylistFolderOpen extends PlaylistFilesEvent {
+  final String folderPath;
 
-  PlaylistFoldersOpen({required this.folderPaths});
+  PlaylistFolderOpen({required this.folderPath});
 }
 class PlaylistFilesClear extends PlaylistFilesEvent {
   final String playlistName;

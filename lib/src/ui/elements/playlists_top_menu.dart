@@ -1,5 +1,8 @@
+import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
+import 'package:audio_flow/src/bloc/bottom_bar_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
+import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/ui/routes/open_files_and_folders.dart' show OpenFilesAndFolders;
@@ -7,11 +10,17 @@ import 'package:flutter/material.dart';
 
 class PlayListMenu extends StatelessWidget {
   final double headerHeight;
+  final ThemeBloc themeBloc;
+  final AudioPlayerBloc audioPlayerBloc;
+  final BottomBarBloc bottomBarBloc;
   final PlaylistFilesBloc playlistFilesBloc;
   final PlaylistNameBloc playlistNameBloc;
   const PlayListMenu({
     super.key,
     required this.headerHeight,
+    required this.themeBloc,
+    required this.audioPlayerBloc,
+    required this.bottomBarBloc,
     required this.playlistFilesBloc,
     required this.playlistNameBloc,
   });
@@ -39,7 +48,13 @@ class PlayListMenu extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (context) => OpenFilesAndFolders(),
+                    builder: (context) => OpenFilesAndFolders(
+                      themeBloc: themeBloc,
+                      audioPlayerBloc: audioPlayerBloc,
+                      bottomBarBloc: bottomBarBloc,
+                      playlistFilesBloc: playlistFilesBloc,
+                      playlistNameBloc: playlistNameBloc,
+                    ),
                   ),
                 );
               },

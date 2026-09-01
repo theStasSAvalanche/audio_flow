@@ -1,8 +1,10 @@
 import 'dart:io' show File;
 
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
+import 'package:audio_flow/src/bloc/bottom_bar_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
+import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/ui/elements/playlists_top_menu.dart'
     show PlayListMenu;
 import 'package:flutter/material.dart';
@@ -14,14 +16,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
 
 class MainPage extends StatelessWidget {
+  final ThemeBloc themeBloc;
   final AudioPlayerBloc audioPlayerBloc;
-  final ScrollController scrollController;
+  final BottomBarBloc bottomBarBloc;
   final PlaylistFilesBloc playlistFilesBloc;
   final PlaylistNameBloc playlistNameBloc;
+  final ScrollController scrollController;
   const MainPage({
     super.key,
-    required this.audioPlayerBloc,
     required this.scrollController,
+    required this.themeBloc,
+    required this.audioPlayerBloc,
+    required this.bottomBarBloc,
     required this.playlistFilesBloc,
     required this.playlistNameBloc,
   });
@@ -73,6 +79,9 @@ class MainPage extends StatelessWidget {
                 height: headerHeight * 0.15,
                 child: PlayListMenu(
                   headerHeight: headerHeight,
+                  themeBloc: themeBloc,
+                  audioPlayerBloc: audioPlayerBloc,
+                  bottomBarBloc: bottomBarBloc,
                   playlistFilesBloc: playlistFilesBloc,
                   playlistNameBloc: playlistNameBloc,
                 ),
@@ -100,6 +109,8 @@ class MainPage extends StatelessWidget {
 }
 
 class AudioFlowScrollController extends HookWidget {
+  final ThemeBloc themeBloc;
+  final BottomBarBloc bottomBarBloc;
   final AudioPlayerBloc audioPlayerBloc;
   final ScrollController scrollController;
   final PlaylistFilesBloc playlistFilesBloc;
@@ -107,6 +118,8 @@ class AudioFlowScrollController extends HookWidget {
 
   const AudioFlowScrollController({
     super.key,
+    required this.themeBloc,
+    required this.bottomBarBloc,
     required this.audioPlayerBloc,
     required this.scrollController,
     required this.playlistFilesBloc,
@@ -116,10 +129,13 @@ class AudioFlowScrollController extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return MainPage(
+      themeBloc: themeBloc,
+      bottomBarBloc: bottomBarBloc,
       audioPlayerBloc: audioPlayerBloc,
       scrollController: scrollController,
       playlistFilesBloc: playlistFilesBloc,
       playlistNameBloc: playlistNameBloc,
+
     );
   }
 }

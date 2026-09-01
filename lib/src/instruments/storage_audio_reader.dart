@@ -7,7 +7,7 @@ import 'package:audio_flow/src/configuration/logger.dart' show logger;
 // import 'package:audio_flow/src/instruments/hive_audio_database.dart'
 //     show savePlaylistToHive;
 
-Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromStorage(String folder) async {
+Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(String folder) async {
   logger.log.d('Get audio content started');
 
   final audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
@@ -36,6 +36,7 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromStorage(Str
   return audioDatabase;
 }
 
+
 Future<AudioMetadata> readMp3Tags(File file) async {
   final metadata = readMetadata(file, getImage: true);
   logger.log.t('Title: ${metadata.title}');
@@ -44,4 +45,35 @@ Future<AudioMetadata> readMp3Tags(File file) async {
   logger.log.t('Duration: ${metadata.duration}');
 
   return metadata;
+}
+
+
+Future<List<String>> readStorageContents(String? folderPath) async {
+  // Example path pointing to the public Downloads directory
+  String path = folderPath ?? '/storage/emulated/0/Download'; 
+  Directory directory = Directory(path);
+  List<String> subDirectories = [];
+
+  try {
+    if (await directory.exists()) {
+      // List all files and folders (set recursive: true to search subfolders)
+      List<FileSystemEntity> entities = directory.listSync(recursive: false);
+
+      for (var entity in entities) {
+        if (entity is Directory) {
+          // logger.log.d('Folder found: ${entity.path}');
+          subDirectories.add(entity.toString());
+        }
+        // else if (entity is File) {
+        //   // logger.log.d('File found: ${entity.path}');
+        // }
+      }
+    } else {
+      logger.log.w("Directory does not exist");
+    }
+  } catch (e) {
+    logger.log.e("Error reading storage: $e");
+  }
+
+  return subDirectories;
 }
