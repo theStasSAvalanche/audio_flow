@@ -152,8 +152,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
           widget.entity.isChecked = !widget.entity.isChecked;
           if (widget.entity.isChecked) {
             settings.pathsToScan.add(widget.entity);
-          }
-          else {
+          } else {
             settings.pathsToScan.remove(widget.entity);
           }
           setState(() {});
@@ -161,16 +160,32 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
       ),
       title: Row(
         children: [
-          Icon(widget.entity.isDir ? Icons.folder_outlined : Icons.audio_file),
+          Icon(
+            widget.entity.isDir
+                ? (widget.entity.name != '..'
+                      ? Icons.folder_outlined : Icons.arrow_upward)
+                : Icons.audio_file,
+          ),
           SizedBox(width: 8),
           Text(widget.entity.name),
         ],
       ),
       onTap: () {
-        var nextDir = '${settings.currentScanDir}${Platform.pathSeparator}${widget.entity.name}';
+        late String nextDir;
+        if (widget.entity.name == '..') {
+          nextDir = widget.entity.fullPath;
+        } else {
+          nextDir =
+              '${settings.currentScanDir}${Platform.pathSeparator}${widget.entity.name}';
+        }
         settings.currentScanDir = nextDir;
         logger.log.d('Next scan dir: $nextDir');
-        settings.storageNavigatorBloc.add(StorageNavigatorScanEvent(dir: nextDir, isChecked: widget.entity.isChecked));
+        settings.storageNavigatorBloc.add(
+          StorageNavigatorScanEvent(
+            dir: nextDir,
+            isChecked: widget.entity.isChecked,
+          ),
+        );
       },
     );
   }
