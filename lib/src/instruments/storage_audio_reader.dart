@@ -4,14 +4,13 @@ import 'package:audio_flow/src/models/audio_flow_file.dart';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
-// import 'package:audio_flow/src/instruments/hive_audio_database.dart'
-//     show savePlaylistToHive;
 
-Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(String folder) async {
+Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(
+  String folder,
+) async {
   logger.log.d('Get audio content started');
 
   final audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
-  // final audioContent = <AudioFlowFile>[];
   final Directory audioDir = Directory(folder);
 
   List<FileSystemEntity> entities = await audioDir
@@ -22,13 +21,9 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(Stri
       var audioFile = AudioFlowFile.fromMetadata(
         metadata: await readMp3Tags(entity),
       );
-      if (audioFile.artist != null && audioFile.album != null) {
-        audioDatabase
-            .putIfAbsent('_${audioFile.artist}_${audioFile.album}', () => [])
-            .add(audioFile);
-      } else {
-        audioDatabase.putIfAbsent('Untagged', () => []).add(audioFile);
-      }
+      File f = File(audioFile.filePath);
+      String parentDir = f.parent.path.toString();
+      audioDatabase.putIfAbsent(parentDir, () => []).add(audioFile);
     }
   }
   logger.log.d('Tracks found: audioContent');
@@ -36,6 +31,20 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(Stri
   return audioDatabase;
 }
 
+Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFile(
+  String file,
+) async {
+  var audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
+  if (!file.endsWith('.mp3')) {
+    return audioDatabase;
+  }
+  
+  File f = File(file);
+  String parentDir = f.parent.path.toString();
+  var audioFile = AudioFlowFile.fromMetadata(metadata: await readMp3Tags(f));
+  audioDatabase.putIfAbsent(parentDir, () => []).add(audioFile);
+  return audioDatabase;
+}
 
 Future<AudioMetadata> readMp3Tags(File file) async {
   final metadata = readMetadata(file, getImage: true);
@@ -47,10 +56,9 @@ Future<AudioMetadata> readMp3Tags(File file) async {
   return metadata;
 }
 
-
-Future<List<String>> readStorageContents(String? folderPath) async {
+Future<List<String>> readStorageContents(String folderPath) async {
   // Example path pointing to the public Downloads directory
-  String path = folderPath ?? '/storage/emulated/0/Download'; 
+  String path = folderPath;
   Directory directory = Directory(path);
   List<String> subDirectories = [];
 

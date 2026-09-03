@@ -4,6 +4,7 @@ class FileSystemCustomEntity {
   final String name;
   final String fullPath;
   final bool isDir;
+  bool isChecked = false;
 
   FileSystemCustomEntity({required this.name, required this.fullPath, required this.isDir});
 

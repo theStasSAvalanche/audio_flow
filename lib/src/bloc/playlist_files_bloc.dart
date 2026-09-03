@@ -2,6 +2,7 @@ import 'package:audio_flow/src/configuration/config.dart' show settings;
 // import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/instruments/hive_audio_database.dart';
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
+import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
@@ -12,7 +13,6 @@ class PlaylistFilesBloc extends Bloc<PlaylistFilesEvent, PlaylistFilesState> {
   PlaylistFilesBloc() : super(PlaylistFilesInitial()) {
     on<PlaylistFilesFromHive>(_onPlaylistFilesFromHive);
     on<PlaylistFilesOpen>(_onPlaylistFilesOpen);
-    on<PlaylistFolderOpen>(_onPlaylistFoldersOpen);
     on<PlaylistFilesClear>(_onPlaylistFilesClear);
   }
 
@@ -29,20 +29,10 @@ class PlaylistFilesBloc extends Bloc<PlaylistFilesEvent, PlaylistFilesState> {
     PlaylistFilesOpen event,
     Emitter<PlaylistFilesState> emit,
   ) async {
-    var audioPlaylist = settings.audioPlaylist;
-    // TODO: implement final String folderPath;
-
-    emit(PlaylistFilesDataExists(audioPlaylist: audioPlaylist));
-  }
-
-  Future<void> _onPlaylistFoldersOpen(
-    PlaylistFolderOpen event,
-    Emitter<PlaylistFilesState> emit,
-  ) async {
     emit(PlaylistFilesLoading());
-    var audioPlaylist = settings.audioPlaylist;
-
-
+    await updatePlaylistToHive(event.pathsToScan, settings.playlistName);
+    var audioPlaylist = await getPlaylistFromHive(settings.playlistName);
+    settings.pathsToScan.clear();
     emit(PlaylistFilesDataExists(audioPlaylist: audioPlaylist));
   }
 

@@ -8,12 +8,11 @@ class PlaylistFilesFromHive extends PlaylistFilesEvent {
 
   PlaylistFilesFromHive({required this.playlistName});
 }
-class PlaylistFilesOpen extends PlaylistFilesEvent {}
-class PlaylistFolderOpen extends PlaylistFilesEvent {
-  final String folderPath;
-
-  PlaylistFolderOpen({required this.folderPath});
+class PlaylistFilesOpen extends PlaylistFilesEvent {
+  final List<FileSystemCustomEntity> pathsToScan;
+  PlaylistFilesOpen({required this.pathsToScan}); 
 }
+
 class PlaylistFilesClear extends PlaylistFilesEvent {
   final String playlistName;
 

@@ -1,4 +1,6 @@
+import 'package:audio_flow/src/bloc/storage_navigator_bloc.dart' show StorageNavigatorBloc;
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
+import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
 import 'package:logger/logger.dart' show Level;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart' show ThemeMode;
@@ -46,8 +48,13 @@ class Settings {
   var repeatMode = getRepeatStatus(_prefs.getString('repeatMode'));
   var playlistName = _prefs.getString('playlistName') ?? 'Playlist 1';
 
+  // collections of BLoC
+  final storageNavigatorBloc = StorageNavigatorBloc();
+
   // Additional structures
   late List<AudioFlowFile> audioPlaylist;
+  List<FileSystemCustomEntity> pathsToScan = [];
+  String currentScanDir = '/storage/emulated/0';
 
   void setNewThemeMode(ThemeMode newThemeMode) {
     themeMode = newThemeMode;
