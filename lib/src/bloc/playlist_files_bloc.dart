@@ -1,5 +1,5 @@
 import 'package:audio_flow/src/configuration/config.dart' show settings;
-// import 'package:audio_flow/src/configuration/logger.dart' show logger;
+import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/instruments/hive_audio_database.dart';
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
 import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
@@ -22,6 +22,8 @@ class PlaylistFilesBloc extends Bloc<PlaylistFilesEvent, PlaylistFilesState> {
   ) async {
     var audioPlaylist = await getPlaylistFromHive(event.playlistName);
     settings.audioPlaylist = audioPlaylist;
+    logger.log.d('Playlist from hive:');
+    logger.logNS.d(audioPlaylist);
     emit(PlaylistFilesDataExists(audioPlaylist: audioPlaylist));
   }
 
@@ -31,9 +33,9 @@ class PlaylistFilesBloc extends Bloc<PlaylistFilesEvent, PlaylistFilesState> {
   ) async {
     emit(PlaylistFilesLoading());
     await updatePlaylistToHive(event.pathsToScan, settings.playlistName);
-    var audioPlaylist = await getPlaylistFromHive(settings.playlistName);
     settings.pathsToScan.clear();
-    emit(PlaylistFilesDataExists(audioPlaylist: audioPlaylist));
+
+    add(PlaylistFilesFromHive(playlistName: settings.playlistName));
   }
 
   Future<void> _onPlaylistFilesClear(

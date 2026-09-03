@@ -1,6 +1,7 @@
 import 'package:audio_flow/src/bloc/storage_navigator_bloc.dart' show StorageNavigatorBloc;
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
 import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
+import 'package:hive_ce/hive.dart';
 import 'package:logger/logger.dart' show Level;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart' show ThemeMode;
@@ -31,6 +32,10 @@ class Settings {
     _prefs = await SharedPreferences.getInstance();
   }
 
+  Future<void> initLazyBox() async {
+    lazyBox = await Hive.openLazyBox(settings.playlistName);
+  }
+
   // make settings persistent
   static late final SharedPreferences _prefs;
 
@@ -46,12 +51,13 @@ class Settings {
   var currentTrackNumber = _prefs.getInt('currentTrackNumber') ?? -1;
   var isRandom = _prefs.getBool('isRandom') ?? false;
   var repeatMode = getRepeatStatus(_prefs.getString('repeatMode'));
-  var playlistName = _prefs.getString('playlistName') ?? 'Playlist 1';
 
   // collections of BLoC
   final storageNavigatorBloc = StorageNavigatorBloc();
 
   // Additional structures
+  var playlistName = _prefs.getString('playlistName') ?? 'Playlist 1';
+  late LazyBox lazyBox;
   late List<AudioFlowFile> audioPlaylist;
   List<FileSystemCustomEntity> pathsToScan = [];
   String currentScanDir = '/storage/emulated/0';

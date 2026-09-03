@@ -1,10 +1,10 @@
 import 'dart:collection';
 
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/instruments/storage_audio_reader.dart';
 import 'package:audio_flow/src/models/audio_flow_file.dart';
 import 'package:audio_flow/src/models/filesystem_entity.dart'
     show FileSystemCustomEntity;
-import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
 
@@ -12,10 +12,8 @@ import 'package:audio_flow/src/configuration/logger.dart' show logger;
 Future<SplayTreeMap<String, List<AudioFlowFile>>> getDictFromHive(String playlist) async {
   logger.log.d('Get dictionary with name: $playlist from Hive');
   var audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
-  var box = await Hive.openBox(playlist);
-
-  for (var key in box.keys) {
-    audioDatabase[key] = List<AudioFlowFile>.from(box.get(key));
+  for (var key in settings.lazyBox.keys) {
+    audioDatabase[key] = List<AudioFlowFile>.from(await settings.lazyBox.get(key));
     // audioDatabase[key]!.sort((a, b) => a.compareTo(b)); - don't need,
     // because SplayTreeMap already sorted by keys and has sorted List arrays
   }
@@ -41,23 +39,21 @@ Future<void> savePlaylistToHive(
   SplayTreeMap<String, List<AudioFlowFile>> audioDatabase,
 ) async {
   logger.log.d('Save playlist with name: $playlist to Hive');
-  var box = await Hive.openBox(playlist);
-  if (box.isNotEmpty) {
-    await box.clear();
+  if (settings.lazyBox.isNotEmpty) {
+    await settings.lazyBox.clear();
   }
 
   for (var key in audioDatabase.keys) {
     audioDatabase[key]!.sort((a, b) => a.compareTo(b));
-    for (var file in audioDatabase[key]!) {
-      logger.logNS.i(file.toString());
-    }
-    await box.put(playlist, audioDatabase[key]);
+    // for (var file in audioDatabase[key]!) {
+    //   logger.logNS.i(file.toString());
+    // }
+    await settings.lazyBox.put(key, audioDatabase[key]);
   }
 }
 
 Future<void> clearPlaylistFromHive(String playlist) async {
-  var box = await Hive.openBox(playlist);
-  await box.clear();
+  await settings.lazyBox.clear();
 }
 
 Future<void> updatePlaylistToHive(
@@ -93,5 +89,8 @@ Future<void> updatePlaylistToHive(
     }
   }
 
-  savePlaylistToHive(playlist, audioDatabase);
+  logger.log.d('Updated audio database is:');
+  logger.logNS.d(audioDatabase);
+
+  await savePlaylistToHive(playlist, audioDatabase);
 }

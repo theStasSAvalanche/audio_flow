@@ -72,16 +72,19 @@ class OpenFilesAndFolders extends StatelessWidget {
                   children: [
                     ElevatedButton(
                       onPressed: () {
+                        settings.currentScanDir = '/storage/emulated/0';
+                        logger.log.d('Folder to scan: ${settings.pathsToScan}');
                         playlistFilesBloc.add(
                           PlaylistFilesOpen(pathsToScan: settings.pathsToScan),
                         );
                         Navigator.pop(context);
                       },
-                      child: const Text('OK'),
+                      child: const Text('Add'),
                     ),
                     SizedBox(),
                     ElevatedButton(
                       onPressed: () {
+                        settings.currentScanDir = '/storage/emulated/0';
                         Navigator.pop(context);
                       },
                       child: const Text('Cancel'),
@@ -160,7 +163,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
         children: [
           Icon(widget.entity.isDir ? Icons.folder_outlined : Icons.audio_file),
           SizedBox(width: 8),
-          SingleChildScrollView(child: Text(widget.entity.name)),
+          Text(widget.entity.name),
         ],
       ),
       onTap: () {

@@ -8,11 +8,12 @@ import 'package:audio_flow/src/ui/basic_material_app.dart' show AudioFlowApp;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Settings.initSettings();
-  // settings.clearAllSettings();
-  await initLogger();
   await Hive.initFlutter();
   Hive.registerAdapters();
+  await Settings.initSettings();
+  await settings.initLazyBox();
+  // settings.clearAllSettings();
+  await initLogger();
   settings.setPlayerStatus(AudioStatus.initial);
   logger.log.d('Application started');
   logger.logNS.d('Let\'s go!!!');

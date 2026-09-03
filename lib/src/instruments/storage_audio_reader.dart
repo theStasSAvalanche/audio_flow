@@ -17,7 +17,7 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(
       .list(recursive: true, followLinks: false)
       .toList();
   for (var entity in entities) {
-    if (entity is File && entity.path.endsWith('mp3')) {
+    if (entity is File && entity.path.endsWith('.mp3')) {
       var audioFile = AudioFlowFile.fromMetadata(
         metadata: await readMp3Tags(entity),
       );
@@ -26,6 +26,7 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(
       audioDatabase.putIfAbsent(parentDir, () => []).add(audioFile);
     }
   }
+  logger.log.d(audioDatabase);
   logger.log.d('Tracks found: audioContent');
 
   return audioDatabase;

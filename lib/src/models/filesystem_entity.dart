@@ -15,6 +15,6 @@ class FileSystemCustomEntity {
 
   @override
   String toString() {
-    return name;
+    return fullPath;
   }
 }
