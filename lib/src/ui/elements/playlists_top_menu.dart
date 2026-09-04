@@ -2,6 +2,7 @@ import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/bloc/bottom_bar_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
+import 'package:audio_flow/src/bloc/storage_navigator_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
@@ -54,6 +55,7 @@ class PlayListMenu extends StatelessWidget {
                       bottomBarBloc: bottomBarBloc,
                       playlistFilesBloc: playlistFilesBloc,
                       playlistNameBloc: playlistNameBloc,
+                      storageNavigatorBloc: StorageNavigatorBloc(),
                     ),
                   ),
                 );

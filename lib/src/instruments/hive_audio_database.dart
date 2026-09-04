@@ -80,10 +80,9 @@ Future<void> updatePlaylistToHive(
       }
 
       else {
+        audioData[key]!.clear();
         for (var value in audioData[key]!) {
-          if (!audioDatabase[key]!.contains(value)) {
-            audioDatabase[key]!.add(value);
-          }
+          audioDatabase[key]!.add(value);
         }
       }
     }

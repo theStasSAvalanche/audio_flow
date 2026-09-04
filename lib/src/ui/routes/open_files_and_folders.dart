@@ -25,6 +25,7 @@ class OpenFilesAndFolders extends StatelessWidget {
   final BottomBarBloc bottomBarBloc;
   final PlaylistFilesBloc playlistFilesBloc;
   final PlaylistNameBloc playlistNameBloc;
+  final StorageNavigatorBloc storageNavigatorBloc;
   const OpenFilesAndFolders({
     super.key,
     required this.themeBloc,
@@ -32,12 +33,13 @@ class OpenFilesAndFolders extends StatelessWidget {
     required this.bottomBarBloc,
     required this.playlistFilesBloc,
     required this.playlistNameBloc,
+    required this.storageNavigatorBloc,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<StorageNavigatorBloc, StorageNavigatorState>(
-      bloc: settings.storageNavigatorBloc
+      bloc: storageNavigatorBloc
         ..add(
           StorageNavigatorScanEvent(
             dir: settings.currentScanDir,
@@ -61,6 +63,7 @@ class OpenFilesAndFolders extends StatelessWidget {
                       return SystemEntityTile(
                         key: ValueKey(item.fullPath),
                         entity: item,
+                        storageNavigatorBloc: storageNavigatorBloc,
                       );
                     },
                   ),
@@ -136,7 +139,12 @@ class OpenFilesAndFolders extends StatelessWidget {
 
 class SystemEntityTile extends StatefulWidget {
   final FileSystemCustomEntity entity;
-  const SystemEntityTile({super.key, required this.entity});
+  final StorageNavigatorBloc storageNavigatorBloc;
+  const SystemEntityTile({
+    super.key,
+    required this.entity,
+    required this.storageNavigatorBloc,
+  });
 
   @override
   State<SystemEntityTile> createState() => _SystemEntityTileState();
@@ -163,7 +171,8 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
           Icon(
             widget.entity.isDir
                 ? (widget.entity.name != '..'
-                      ? Icons.folder_outlined : Icons.arrow_upward)
+                      ? Icons.folder_outlined
+                      : Icons.arrow_upward)
                 : Icons.audio_file,
           ),
           SizedBox(width: 8),
@@ -180,7 +189,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
         }
         settings.currentScanDir = nextDir;
         logger.log.d('Next scan dir: $nextDir');
-        settings.storageNavigatorBloc.add(
+        widget.storageNavigatorBloc.add(
           StorageNavigatorScanEvent(
             dir: nextDir,
             isChecked: widget.entity.isChecked,
