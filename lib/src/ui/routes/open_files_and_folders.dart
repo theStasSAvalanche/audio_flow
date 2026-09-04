@@ -14,6 +14,7 @@ import 'package:audio_flow/src/models/filesystem_entity.dart'
 import 'package:audio_flow/src/ui/elements/app_bar.dart' show AudioFlowAppBar;
 import 'package:audio_flow/src/ui/elements/bottom_bar.dart'
     show AudioFlowBottomBar;
+import 'package:audio_flow/src/ui/elements/floating_action_button.dart';
 import 'package:audio_flow/src/ui/elements/left_drawer.dart'
     show AudioFlowDrawer;
 import 'package:flutter/material.dart';
@@ -106,29 +107,8 @@ class OpenFilesAndFolders extends StatelessWidget {
               bottomBarBloc: bottomBarBloc,
             ),
             floatingActionButtonLocation: .centerDocked,
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                if (settings.playerStatus == AudioStatus.initial) {
-                  audioPlayerBloc.add(
-                    AudioPlayerPlayEvent(settings.currentTrackNumber),
-                  );
-                } else if (settings.playerStatus == AudioStatus.playing) {
-                  audioPlayerBloc.add(AudioPlayerPauseEvent());
-                } else if (settings.playerStatus == AudioStatus.paused) {
-                  audioPlayerBloc.add(AudioPlayerResumeEvent());
-                }
-              },
-              tooltip: 'Play/Pause',
-              child: BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
-                bloc: audioPlayerBloc,
-                builder: (contextA, stateA) {
-                  if (stateA is AudioPlayerPlaying) {
-                    return Icon(Icons.pause);
-                  }
-
-                  return Icon(Icons.play_arrow);
-                },
-              ),
+            floatingActionButton: AudioFlowFloatingActionButton(
+              audioPlayerBloc: audioPlayerBloc,
             ),
           );
         }

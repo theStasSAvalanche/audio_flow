@@ -2,6 +2,8 @@ import 'package:audio_flow/src/bloc/bottom_bar_bloc.dart';
 import 'package:audio_flow/src/bloc/permission_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
+import 'package:audio_flow/src/ui/elements/floating_action_button.dart'
+    show AudioFlowFloatingActionButton;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -75,9 +77,7 @@ class AudioFlowMaterial extends StatelessWidget {
                           playlistFilesBloc: playlistFilesBloc,
                           playlistNameBloc: playlistNameBloc,
                         );
-                      }
-                      
-                      else if (state is PermissionDenied) {
+                      } else if (state is PermissionDenied) {
                         return Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -98,35 +98,16 @@ class AudioFlowMaterial extends StatelessWidget {
                   ),
                 ),
               ),
-              drawer: AudioFlowDrawer(playlistNameBloc: playlistNameBloc,), // Left-sided menu
+              drawer: AudioFlowDrawer(
+                playlistNameBloc: playlistNameBloc,
+              ), // Left-sided menu
               bottomNavigationBar: AudioFlowBottomBar(
                 audioPlayerBloc: audioPlayerBloc,
                 bottomBarBloc: bottomBarBloc,
               ),
               floatingActionButtonLocation: .centerDocked,
-              floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  if (settings.playerStatus == AudioStatus.initial) {
-                    audioPlayerBloc.add(
-                      AudioPlayerPlayEvent(settings.currentTrackNumber),
-                    );
-                  } else if (settings.playerStatus == AudioStatus.playing) {
-                    audioPlayerBloc.add(AudioPlayerPauseEvent());
-                  } else if (settings.playerStatus == AudioStatus.paused) {
-                    audioPlayerBloc.add(AudioPlayerResumeEvent());
-                  }
-                },
-                tooltip: 'Play/Pause',
-                child: BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
-                  bloc: audioPlayerBloc,
-                  builder: (contextA, stateA) {
-                    if (stateA is AudioPlayerPlaying) {
-                      return Icon(Icons.pause);
-                    }
-
-                    return Icon(Icons.play_arrow);
-                  },
-                ),
+              floatingActionButton: AudioFlowFloatingActionButton(
+                audioPlayerBloc: audioPlayerBloc,
               ),
             ),
           );
