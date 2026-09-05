@@ -1,14 +1,12 @@
 import 'dart:math' show Random;
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
-import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:meta/meta.dart';
 
 import 'package:audio_flow/src/configuration/config.dart'
     show settings, AudioStatus, RepeatStatus;
-import 'package:audio_flow/src/instruments/audio_player.dart' show player;
 
 part 'audio_player_event.dart';
 part 'audio_player_state.dart';
@@ -33,7 +31,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerPlayEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
-    if (! await activateAudioSession()) {
+    if (!await activateAudioSession()) {
       return;
     }
     var index = event.trackNumber ?? settings.currentTrackNumber;
@@ -45,10 +43,12 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     logger.log.d('Now playing: ${settings.audioPlaylist[index].toString()}');
     settings.setCurrentTrackNumber(index);
     settings.setPlayerStatus(AudioStatus.playing);
-    await player.audioPlayer.stop();
-    player.audioPlayer.play(
-      DeviceFileSource(settings.audioPlaylist[index].filePath),
+    settings.soloud.stopAll();
+    await settings.soloud.disposeAllSources();
+    settings.audioSource = await settings.soloud.playSource(
+      file: settings.audioPlaylist[index].filePath,
     );
+    settings.audioHandle = settings.soloud.play(settings.audioSource!);
     emit(AudioPlayerPlaying());
   }
 
@@ -56,10 +56,12 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerPauseEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
-    if (state is AudioPlayerPlaying) {
-      settings.setPlayerStatus(AudioStatus.paused);
-      player.audioPlayer.pause();
+    // TODO: Pause not works
+    if (state is AudioPlayerPlaying && settings.audioHandle != null) {
+      logger.log.d('Pausing...');
+      settings.soloud.setPause(settings.audioHandle!, true);
       await deactivateAudioSession();
+      settings.setPlayerStatus(AudioStatus.paused);
       emit(AudioPlayerPaused());
     }
   }
@@ -68,15 +70,18 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerResumeEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
-    if (! await activateAudioSession()) {
+    if (!await activateAudioSession() ||
+        settings.audioHandle == null ||
+        !settings.soloud.getPause(settings.audioHandle!)) {
       return;
     }
+
+    settings.soloud.setPause(settings.audioHandle!, false);
     settings.setPlayerStatus(AudioStatus.playing);
-    player.audioPlayer.resume();
     emit(AudioPlayerPlaying());
   }
 
-  Future<void> _onAudioNextEvent (
+  Future<void> _onAudioNextEvent(
     AudioPlayerNextEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
@@ -84,12 +89,13 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       return;
     }
 
-    if (state is AudioPlayerPaused && ! await activateAudioSession()) {
+    if (state is AudioPlayerPaused && !await activateAudioSession()) {
       return;
     }
-    
+
     if (settings.repeatMode == RepeatStatus.one) {
-      await player.audioPlayer.stop();
+      settings.soloud.stopAll();
+      await settings.soloud.disposeAllSources();
       playFromIndex(settings.currentTrackNumber);
       return;
     }
@@ -104,8 +110,9 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       add(AudioPlayerStopEvent());
       return;
     }
-    
-    var nextTrack = (settings.currentTrackNumber + 1) % settings.audioPlaylist.length;
+
+    var nextTrack =
+        (settings.currentTrackNumber + 1) % settings.audioPlaylist.length;
     playFromIndex(nextTrack);
   }
 
@@ -117,12 +124,13 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       return;
     }
 
-    if (state is AudioPlayerPaused && ! await activateAudioSession()) {
+    if (state is AudioPlayerPaused && !await activateAudioSession()) {
       return;
     }
 
     if (settings.repeatMode == RepeatStatus.one) {
-      await player.audioPlayer.stop();
+      settings.soloud.stopAll();
+      await settings.soloud.disposeAllSources();
       playFromIndex(settings.currentTrackNumber);
       return;
     }
@@ -131,7 +139,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       setRandomTrack();
       return;
     }
-    
+
     if (settings.repeatMode == RepeatStatus.off &&
         settings.currentTrackNumber == 0) {
       add(AudioPlayerStopEvent());
@@ -152,7 +160,8 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerStopEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
-    await player.audioPlayer.stop();
+    settings.soloud.stopAll();
+    await settings.soloud.disposeAllSources();
     await deactivateAudioSession();
     settings.setCurrentTrackNumber(-1);
     settings.setPlayerStatus(AudioStatus.initial);

@@ -1,6 +1,7 @@
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
 import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
 import 'package:audio_session/audio_session.dart' show AudioSession;
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:logger/logger.dart' show Level;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,27 +21,14 @@ enum RepeatStatus {
 }
 
 class Settings {
-  static final Settings _instance = Settings._internal();
-
-  Settings._internal();
-
-  factory Settings() {
-    return _instance;
-  }
-
-  static Future<void> initSettings() async {
-    _prefs = await SharedPreferences.getInstance();
-  }
-
-  Future<void> initLazyBox() async {
-    lazyBox = await Hive.openLazyBox(settings.playlistName);
-  }
-
   // make settings persistent
   static late final SharedPreferences _prefs;
 
-  // audio_session
+  // audio output settings
   late AudioSession audioSession;
+  final SoLoud soloud = SoLoud.instance;
+  AudioSource? audioSource;
+  SoundHandle? audioHandle;
 
   // Debug and logging
   var isDebug = _prefs.getBool('isDebug') ?? false;
@@ -61,6 +49,34 @@ class Settings {
   late List<AudioFlowFile> audioPlaylist;
   List<FileSystemCustomEntity> pathsToScan = [];
   String currentScanDir = '/storage/emulated/0';
+
+  static final Settings _instance = Settings._internal();
+
+  Settings._internal();
+
+  factory Settings() {
+    return _instance;
+  }
+
+  static Future<void> initSettings() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  Future<void> initLazyBox() async {
+    lazyBox = await Hive.openLazyBox(settings.playlistName);
+  }
+
+  Future<void> initSoloud() async {
+    await soloud.init(); // Initialize engine with defaults
+  }
+
+  Future<void> disposeSoloud() async {
+    // Shutdown engine and free assets
+    if (audioSource != null) {
+      await soloud.disposeAllSources();
+    }
+    soloud.deinit();
+  }
 
   void setNewThemeMode(ThemeMode newThemeMode) {
     themeMode = newThemeMode;
@@ -102,7 +118,7 @@ class Settings {
     _prefs.setString('playlistName', settings.playlistName);
   }
 
-  void dispose() {
+  Future<void> dispose() async {
     _prefs.setBool('isDebug', isDebug);
     _prefs.setString('logLevel', logLevel.name);
     _prefs.setString('logFileName', logFileName);
@@ -112,6 +128,7 @@ class Settings {
     _prefs.setBool('isRandom', settings.isRandom);
     _prefs.setString('isRepeat', settings.repeatMode.name);
     _prefs.setString('playlistName', settings.playlistName);
+    await disposeSoloud();
   }
 }
 

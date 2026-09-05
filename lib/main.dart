@@ -18,6 +18,7 @@ void main() async {
   settings.audioSession = await AudioSession.instance;
   await settings.audioSession.configure(AudioSessionConfiguration.music());
   settings.setPlayerStatus(AudioStatus.initial);
+  await settings.initSoloud();
   logger.log.d('Application started');
   logger.logNS.d('Let\'s go!!!');
   runApp(const AudioFlowApp());
