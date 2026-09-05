@@ -33,6 +33,9 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerPlayEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
+    if (! await activateAudioSession()) {
+      return;
+    }
     var index = event.trackNumber ?? settings.currentTrackNumber;
 
     if (index < 0 || index > settings.audioPlaylist.length) {
@@ -49,21 +52,25 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     emit(AudioPlayerPlaying());
   }
 
-  void _onAudioPauseEvent(
+  Future<void> _onAudioPauseEvent(
     AudioPlayerPauseEvent event,
     Emitter<AudioPlayerState> emit,
-  ) {
+  ) async {
     if (state is AudioPlayerPlaying) {
       settings.setPlayerStatus(AudioStatus.paused);
       player.audioPlayer.pause();
+      await deactivateAudioSession();
       emit(AudioPlayerPaused());
     }
   }
 
-  void _onAudioResumeEvent(
+  Future<void> _onAudioResumeEvent(
     AudioPlayerResumeEvent event,
     Emitter<AudioPlayerState> emit,
-  ) {
+  ) async {
+    if (! await activateAudioSession()) {
+      return;
+    }
     settings.setPlayerStatus(AudioStatus.playing);
     player.audioPlayer.resume();
     emit(AudioPlayerPlaying());
@@ -74,6 +81,10 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     Emitter<AudioPlayerState> emit,
   ) async {
     if (state is AudioPlayerInitial) {
+      return;
+    }
+
+    if (state is AudioPlayerPaused && ! await activateAudioSession()) {
       return;
     }
     
@@ -103,6 +114,10 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     Emitter<AudioPlayerState> emit,
   ) async {
     if (state is AudioPlayerInitial) {
+      return;
+    }
+
+    if (state is AudioPlayerPaused && ! await activateAudioSession()) {
       return;
     }
 
@@ -138,17 +153,22 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     Emitter<AudioPlayerState> emit,
   ) async {
     await player.audioPlayer.stop();
+    await deactivateAudioSession();
     settings.setCurrentTrackNumber(-1);
     settings.setPlayerStatus(AudioStatus.initial);
     emit(AudioPlayerInitial());
   }
 
-  Future<void> activateAudioSession () {
-    if (await session.setActive(true)) {
-      // Now play audio.
-    } else {
-      // The request was denied and the app should not play audio
+  Future<bool> activateAudioSession() async {
+    if (await settings.audioSession.setActive(true)) {
+      return true;
     }
+
+    return false;
+  }
+
+  Future<void> deactivateAudioSession() async {
+    await settings.audioSession.setActive(false);
   }
 
   void setRandomTrack() {
