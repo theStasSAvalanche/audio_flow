@@ -73,7 +73,7 @@ class AudioFlowBottomBar extends StatelessWidget
                         onPressed: () {
                           bottomBarBloc.add(BottomBarRepeatChanged());
                           logger.log.d(
-                            'Repeat mode set to ${settings.repeatMode.name}',
+                            'Repeat mode set to ${state.repeatMode.name}',
                           );
                         },
                       ),

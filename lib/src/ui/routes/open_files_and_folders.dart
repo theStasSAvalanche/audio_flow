@@ -7,7 +7,7 @@ import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
 import 'package:audio_flow/src/bloc/storage_navigator_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/configuration/config.dart'
-    show settings, AudioStatus;
+    show settings;
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/models/filesystem_entity.dart'
     show FileSystemCustomEntity;

@@ -10,7 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/configuration/config.dart'
-    show AudioStatus, settings;
+    show settings;
 import 'package:audio_flow/src/configuration/logger.dart';
 import 'package:audio_flow/src/ui/theme.dart' show darkTheme, lightTheme;
 import 'package:audio_flow/src/ui/routes/main_page.dart'

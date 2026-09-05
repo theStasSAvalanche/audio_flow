@@ -8,4 +8,14 @@ class BottomBarState {
 
   bool get isRandom => randomState;
   RepeatStatus get repeatMode => repeatState;
+
+  BottomBarState copyWith({
+    bool? newRandomState,
+    RepeatStatus? newRepeatState,
+  }) {
+    return BottomBarState(
+      randomState: newRandomState ?? randomState,
+      repeatState: newRepeatState ?? repeatState,
+    );
+  }
 }

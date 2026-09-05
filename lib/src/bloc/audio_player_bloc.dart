@@ -143,6 +143,14 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     emit(AudioPlayerInitial());
   }
 
+  Future<void> activateAudioSession () {
+    if (await session.setActive(true)) {
+      // Now play audio.
+    } else {
+      // The request was denied and the app should not play audio
+    }
+  }
+
   void setRandomTrack() {
     var random = Random();
     var randomTrack = random.nextInt(settings.audioPlaylist.length);

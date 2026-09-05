@@ -1,5 +1,6 @@
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
 import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
+import 'package:audio_session/audio_session.dart' show AudioSession;
 import 'package:hive_ce/hive.dart';
 import 'package:logger/logger.dart' show Level;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,6 +39,9 @@ class Settings {
   // make settings persistent
   static late final SharedPreferences _prefs;
 
+  // audio_session
+  late AudioSession audioSession;
+
   // Debug and logging
   var isDebug = _prefs.getBool('isDebug') ?? false;
   var logLevel = getLogLevel(_prefs.getString('logLevel'));
@@ -51,7 +55,7 @@ class Settings {
   var isRandom = _prefs.getBool('isRandom') ?? false;
   var repeatMode = getRepeatStatus(_prefs.getString('repeatMode'));
 
-  // Additional structures
+  // Playlist structures
   var playlistName = _prefs.getString('playlistName') ?? 'Playlist 1';
   late LazyBox lazyBox;
   late List<AudioFlowFile> audioPlaylist;
