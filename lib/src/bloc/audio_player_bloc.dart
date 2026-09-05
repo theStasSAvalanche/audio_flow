@@ -45,8 +45,8 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     settings.setPlayerStatus(AudioStatus.playing);
     settings.soloud.stopAll();
     await settings.soloud.disposeAllSources();
-    settings.audioSource = await settings.soloud.playSource(
-      file: settings.audioPlaylist[index].filePath,
+    settings.audioSource = await settings.soloud.loadFile(
+      settings.audioPlaylist[index].filePath
     );
     settings.audioHandle = settings.soloud.play(settings.audioSource!);
     emit(AudioPlayerPlaying());
