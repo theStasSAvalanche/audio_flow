@@ -19,22 +19,22 @@ import 'package:audio_flow/src/ui/elements/left_drawer.dart'
     show AudioFlowDrawer;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class OpenFilesAndFolders extends StatelessWidget {
+class OpenFilesAndFolders extends HookWidget {
   final ThemeBloc themeBloc;
   final AudioPlayerBloc audioPlayerBloc;
   final BottomBarBloc bottomBarBloc;
   final PlaylistFilesBloc playlistFilesBloc;
   final PlaylistNameBloc playlistNameBloc;
-  final StorageNavigatorBloc storageNavigatorBloc;
-  const OpenFilesAndFolders({
+  final storageNavigatorBloc = StorageNavigatorBloc();
+  OpenFilesAndFolders({
     super.key,
     required this.themeBloc,
     required this.audioPlayerBloc,
     required this.bottomBarBloc,
     required this.playlistFilesBloc,
     required this.playlistNameBloc,
-    required this.storageNavigatorBloc,
   });
 
   @override

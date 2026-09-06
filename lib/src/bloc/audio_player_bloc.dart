@@ -56,7 +56,6 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerPauseEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
-    // TODO: Pause not works
     if (state is AudioPlayerPlaying && settings.audioHandle != null) {
       logger.log.d('Pausing...');
       settings.soloud.setPause(settings.audioHandle!, true);
