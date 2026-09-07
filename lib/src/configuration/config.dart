@@ -38,7 +38,6 @@ class Settings {
   // Application settings
   ThemeMode themeMode = _prefs.getString('themeMode') == 'dark' ? ThemeMode.dark : ThemeMode.light;
   AudioStatus playerStatus = AudioStatus.initial;
-  var isAudioFilesPermissionGranted = _prefs.getBool('isAudioFilesPermissionGranted') ?? false;
   var currentTrackNumber = _prefs.getInt('currentTrackNumber') ?? -1;
   var isRandom = _prefs.getBool('isRandom') ?? false;
   var repeatMode = getRepeatStatus(_prefs.getString('repeatMode'));
@@ -123,7 +122,6 @@ class Settings {
     _prefs.setString('logLevel', logLevel.name);
     _prefs.setString('logFileName', logFileName);
     _prefs.setString('themeMode', themeMode.name);
-    _prefs.setBool('isAudioFilesPermissionGranted', isAudioFilesPermissionGranted);
     _prefs.setInt('currentTrackNumber', settings.currentTrackNumber);
     _prefs.setBool('isRandom', settings.isRandom);
     _prefs.setString('isRepeat', settings.repeatMode.name);

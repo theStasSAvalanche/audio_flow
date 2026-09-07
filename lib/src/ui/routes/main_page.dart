@@ -7,6 +7,8 @@ import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/ui/elements/playlists_top_menu.dart'
     show PlayListMenu;
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart'
+    show ProgressBar;
 import 'package:flutter/material.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
@@ -86,7 +88,7 @@ class MainPage extends StatelessWidget {
                   playlistNameBloc: playlistNameBloc,
                 ),
               );
-            }
+            },
           ),
           Expanded(
             child: CustomScrollView(
@@ -101,6 +103,23 @@ class MainPage extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
+            bloc: audioPlayerBloc,
+            builder: (context, state) {
+              return ProgressBar(
+                progress: state.position ?? Duration.zero,
+                total: state.duration ?? Duration.zero,
+                onSeek: (duration) {
+                  audioPlayerBloc.add(
+                    AudioPlayerStartPlayEvent(
+                      audioTrack: state.audioTrack,
+                      startPosition: duration,
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
@@ -135,7 +154,6 @@ class AudioFlowScrollController extends HookWidget {
       scrollController: scrollController,
       playlistFilesBloc: playlistFilesBloc,
       playlistNameBloc: playlistNameBloc,
-
     );
   }
 }

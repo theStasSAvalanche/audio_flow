@@ -68,7 +68,6 @@ class AudioFlowMaterial extends StatelessWidget {
                     builder: (context, state) {
                       if (state is PermissionGranted) {
                         // Next Widgets chain associated with songs list builder
-                        settings.isAudioFilesPermissionGranted = true;
                         return AudioFlowScrollController(
                           themeBloc: themeBloc,
                           bottomBarBloc: bottomBarBloc,
