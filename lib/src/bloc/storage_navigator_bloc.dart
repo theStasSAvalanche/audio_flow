@@ -25,7 +25,7 @@ class StorageNavigatorBloc
     var items = entities
         .map((e) => FileSystemCustomEntity.fromEntity(e))
         .toList();
-    items.sort((a, b) => a.fullPath.compareTo(b.fullPath));
+    items.sort((a, b) => a.fullPath.toLowerCase().compareTo(b.fullPath.toLowerCase()));
     if (event.dir != '/storage/emulated/0') {
       // List<String> pieces = event.dir.split(Platform.pathSeparator);
       // if (pieces.isNotEmpty) pieces.removeLast();
