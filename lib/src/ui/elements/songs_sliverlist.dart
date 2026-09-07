@@ -92,27 +92,27 @@ class SongTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
       buildWhen: (previous, current) {
-        return previous != current || current is AudioPlayerPlaying;
+        return previous != current || current is AudioPlayerStartPlaying;
       },
       builder: (context, state) {
-        if (index == state.trackNumber) {
+        if (song == state.audioTrack) {
           scrollToSliver(tileKey);
         }
         return ListTile(
           key: tileKey,
           title: Text(song.toString()),
           selectedTileColor: Colors.lightBlue.withValues(alpha: 0.3),
-          selected: index == state.trackNumber,
+          selected: song == state.audioTrack,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
           onTap: () {
-            audioPlayerBloc.add(AudioPlayerPlayEvent(index));
+            audioPlayerBloc.add(AudioPlayerStartPlayEvent(audioTrack: song));
           },
           trailing: IconButton(
             icon: Icon(Icons.music_note),
             onPressed: () {
-              audioPlayerBloc.add(AudioPlayerPlayEvent(index));
+              audioPlayerBloc.add(AudioPlayerStartPlayEvent(audioTrack: song));
             },
           ),
         );

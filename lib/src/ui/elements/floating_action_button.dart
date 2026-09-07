@@ -13,7 +13,7 @@ class AudioFlowFloatingActionButton extends StatelessWidget {
       onPressed: () {
         if (settings.playerStatus == AudioStatus.initial) {
           audioPlayerBloc.add(
-            AudioPlayerPlayEvent(settings.currentTrackNumber),
+            AudioPlayerStartPlayEvent(),
           );
         } else if (settings.playerStatus == AudioStatus.playing) {
           audioPlayerBloc.add(AudioPlayerPauseEvent());
@@ -25,7 +25,7 @@ class AudioFlowFloatingActionButton extends StatelessWidget {
       child: BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
         bloc: audioPlayerBloc,
         builder: (contextA, stateA) {
-          if (stateA is AudioPlayerPlaying) {
+          if (stateA is AudioPlayerStartPlaying) {
             return Icon(Icons.pause);
           }
 
