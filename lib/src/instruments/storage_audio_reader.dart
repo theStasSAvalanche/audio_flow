@@ -17,7 +17,7 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(
       .list(recursive: true, followLinks: false)
       .toList();
   for (var entity in entities) {
-    if (entity is File && entity.path.endsWith('.mp3')) {
+    if (entity is File && checkEntityIsAudio(entity.path)) {
       var audioFile = AudioFlowFile.fromMetadata(
         metadata: await readMp3Tags(entity),
       );
@@ -36,14 +36,16 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFile(
   String file,
 ) async {
   var audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
-  if (!file.endsWith('.mp3')) {
+  if (!checkEntityIsAudio(file)) {
     return audioDatabase;
   }
-  
+
   File f = File(file);
   String parentDir = f.parent.path.toString();
   var audioFile = AudioFlowFile.fromMetadata(metadata: await readMp3Tags(f));
   audioDatabase.putIfAbsent(parentDir, () => []).add(audioFile);
+  logger.log.d('File is $file');
+  logger.logNS.d(audioDatabase);
   return audioDatabase;
 }
 
@@ -85,4 +87,8 @@ Future<List<String>> readStorageContents(String folderPath) async {
   }
 
   return subDirectories;
+}
+
+bool checkEntityIsAudio(String entity) {
+  return entity.endsWith('.mp3') || entity.endsWith('.flac');
 }

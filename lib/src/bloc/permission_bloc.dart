@@ -16,8 +16,7 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
     Emitter<PermissionState> emit,
   ) async {
     final status = await Permission.audio.request();
-    final status2 = await Permission.photos.request();
-    if (status.isGranted && status2.isGranted) {
+    if (status.isGranted) {
       emit(PermissionGranted());
     } else {
       emit(PermissionDenied());

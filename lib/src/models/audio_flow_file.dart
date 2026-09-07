@@ -65,4 +65,14 @@ class AudioFlowFile {
 
     return title.compareTo(other.title);
   }
+
+  @override
+  bool operator ==(Object other) {
+    // 1. Check if they are the exact same instance in memory
+    if (identical(this, other)) return true;
+
+    // 2. Check if the other object is of the same type and has the same field values
+    return other is AudioFlowFile &&
+        other.filePath == filePath;
+  }
 }

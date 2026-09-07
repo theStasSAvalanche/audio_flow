@@ -77,7 +77,7 @@ class OpenFilesAndFolders extends HookWidget {
                     ElevatedButton(
                       onPressed: () {
                         settings.currentScanDir = '/storage/emulated/0';
-                        logger.log.d('Folder to scan: ${settings.pathsToScan}');
+                        logger.log.d('Files and folders to scan: ${settings.pathsToScan}');
                         playlistFilesBloc.add(
                           PlaylistFilesOpen(pathsToScan: settings.pathsToScan),
                         );

@@ -60,6 +60,8 @@ Future<void> updatePlaylistToHive(
   List<FileSystemCustomEntity> pathsToScan,
   String playlist,
 ) async {
+  logger.log.d('Update to Hive');
+  logger.logNS.d('Paths: $pathsToScan');
   var audioDatabase = await getDictFromHive(playlist);
   late SplayTreeMap<String, List<AudioFlowFile>> audioData;
 
@@ -67,6 +69,7 @@ Future<void> updatePlaylistToHive(
     if (entity.isDir) {
       audioData = await getAudioContentFromFolder(entity.fullPath);
     } else {
+      logger.log.d('Entity to scan: ${entity.fullPath}');
       audioData = await getAudioContentFromFile(entity.fullPath);
     }
 
@@ -80,9 +83,10 @@ Future<void> updatePlaylistToHive(
       }
 
       else {
-        audioData[key]!.clear();
         for (var value in audioData[key]!) {
-          audioDatabase[key]!.add(value);
+          if (!audioDatabase[key]!.contains(value)) {
+            audioDatabase[key]!.add(value);
+          }
         }
       }
     }
