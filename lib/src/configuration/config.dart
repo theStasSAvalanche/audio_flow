@@ -32,7 +32,8 @@ class Settings {
 
   // Debug and logging
   var isDebug = _prefs.getBool('isDebug') ?? false;
-  var logLevel = getLogLevel(_prefs.getString('logLevel'));
+  // var logLevel = getLogLevel(_prefs.getString('logLevel'));
+  var logLevel = Level.warning;
   var logFileName = _prefs.getString('logFileName') ?? 'app_log.txt';
 
   // Application settings

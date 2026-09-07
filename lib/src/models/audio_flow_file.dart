@@ -67,6 +67,9 @@ class AudioFlowFile {
   }
 
   @override
+  int get hashCode => Object.hash(filePath, title);
+
+  @override
   bool operator ==(Object other) {
     // 1. Check if they are the exact same instance in memory
     if (identical(this, other)) return true;

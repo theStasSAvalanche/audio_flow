@@ -1,5 +1,3 @@
-import 'dart:io' show File;
-
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/bloc/bottom_bar_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
@@ -7,6 +5,7 @@ import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/ui/elements/playlists_top_menu.dart'
     show PlayListMenu;
+import 'package:audio_flow/src/ui/elements/track_info.dart' show TrackInformation;
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart'
     show ProgressBar;
 import 'package:flutter/material.dart';
@@ -40,7 +39,7 @@ class MainPage extends StatelessWidget {
       'Start building slivers inside custom scrollview on main page route!',
     );
     // final double screenHeight = MediaQuery.sizeOf(context).height;
-    final double headerHeight = MediaQuery.sizeOf(context).height / 4;
+    final double headerHeight = MediaQuery.sizeOf(context).height * 0.2;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -48,32 +47,7 @@ class MainPage extends StatelessWidget {
         mainAxisAlignment: .start,
         crossAxisAlignment: .center,
         children: [
-          SizedBox(
-            height: headerHeight * 0.65,
-            child: Row(
-              // Album picture
-              children: [
-                Image.file(
-                  File(
-                    '/storage/emulated/0/Music/Disturbed/Albums/2015 - Immortalized/cover.jpg',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: headerHeight * 0.05),
-          SizedBox(
-            height: headerHeight * 0.15,
-            child: Row(
-              // Current song name
-              children: [
-                Text(
-                  '02. Immortalized',
-                  style: TextStyle(fontSize: 18.0, fontWeight: .w700),
-                ),
-              ],
-            ),
-          ),
+          TrackInformation(audioPlayerBloc: audioPlayerBloc, headerHeight: headerHeight),
           BlocBuilder<PlaylistFilesBloc, PlaylistFilesState>(
             bloc: playlistFilesBloc,
             builder: (context, state) {
@@ -108,6 +82,7 @@ class MainPage extends StatelessWidget {
             bloc: audioPlayerBloc,
             builder: (context, state) {
               return ProgressBar(
+                barHeight: 8.0,
                 progress: state.position ?? Duration.zero,
                 total: state.duration ?? Duration.zero,
                 onSeek: (newPosition) {
