@@ -34,6 +34,10 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       _onAudioUpdateStateEvent,
       transformer: restartable(),
     );
+    on<AudioPlayerSeekPositionEvent>(
+      _onAudioPlayerSeekPositionEvent,
+      transformer: restartable(),
+    );
   }
 
   Future<void> _onAudioPlayEvent(
@@ -55,6 +59,8 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     }
 
     settings.setPlayerStatus(AudioStatus.playing);
+    var index = settings.audioPlaylist.indexOf(track);
+    settings.setCurrentTrackNumber(index);
     settings.soloud.stopAll();
     await settings.soloud.disposeAllSources();
     settings.audioSource = await settings.soloud.loadFile(track.filePath);
@@ -66,7 +72,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     logger.log.d('Now playing: $track');
     emit(AudioPlayerStartPlaying(audioTrack: track));
     tickerSubscription = Stream.periodic(
-      const Duration(milliseconds: 500),
+      const Duration(seconds: 1),
     ).listen((_) => pollPosition(track: track!));
   }
 
@@ -115,6 +121,8 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     if (state is AudioPlayerPaused && !await activateAudioSession()) {
       return;
     }
+
+    logger.log.d('Next audio');
 
     if (settings.repeatMode == RepeatStatus.one) {
       settings.soloud.stopAll();
@@ -195,19 +203,23 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerUpdateStateEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
-    logger.log.d('Emitting information about progress');
     var duration = settings.soloud.getLength(settings.audioSource!);
-    if (event.position >= duration) {
-      tickerSubscription?.cancel();
-      emit(
-        state.copyWith(
-          position: event.position,
-          duration: duration,
-          isPlaying: false,
-        ),
-      );
-    } else {
+    if (event.position <= duration) {
       emit(state.copyWith(position: event.position, duration: duration));
+      return;
+    }
+
+    logger.log.d('Song was ended, go to next event');
+    tickerSubscription?.cancel();
+    add(AudioPlayerNextEvent());
+  }
+
+  Future<void> _onAudioPlayerSeekPositionEvent(
+    AudioPlayerSeekPositionEvent event,
+    Emitter<AudioPlayerState> emit,
+  ) async {
+    if (settings.audioHandle != null) {
+      settings.soloud.seek(settings.audioHandle!, event.position);
     }
   }
 
@@ -234,14 +246,16 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
   }
 
   void pollPosition({required AudioFlowFile track}) {
-    logger.logNS.d('Stream started');
     if (settings.audioHandle == null) {
       return;
     }
-
     final Duration posSeconds = settings.soloud.getPosition(
       settings.audioHandle!,
     );
+    if (!settings.audioSource!.handles.contains(settings.audioHandle!)) {
+      tickerSubscription?.cancel();
+      add(AudioPlayerNextEvent());
+    }
 
     add(AudioPlayerUpdateStateEvent(audioTrack: track, position: posSeconds));
   }

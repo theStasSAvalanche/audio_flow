@@ -31,3 +31,11 @@ class AudioPlayerUpdateStateEvent extends AudioPlayerEvent {
     required this.position,
   });
 }
+
+class AudioPlayerSeekPositionEvent extends AudioPlayerEvent {
+  final Duration position;
+
+  const AudioPlayerSeekPositionEvent({
+    required this.position,
+  });
+}

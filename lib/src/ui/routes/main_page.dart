@@ -110,11 +110,10 @@ class MainPage extends StatelessWidget {
               return ProgressBar(
                 progress: state.position ?? Duration.zero,
                 total: state.duration ?? Duration.zero,
-                onSeek: (duration) {
+                onSeek: (newPosition) {
                   audioPlayerBloc.add(
-                    AudioPlayerStartPlayEvent(
-                      audioTrack: state.audioTrack,
-                      startPosition: duration,
+                    AudioPlayerSeekPositionEvent(
+                      position: newPosition,
                     ),
                   );
                 },
