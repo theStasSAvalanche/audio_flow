@@ -6,9 +6,10 @@ import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
 import 'package:audio_flow/src/bloc/storage_navigator_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
-import 'package:audio_flow/src/configuration/config.dart'
-    show settings;
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
+import 'package:audio_flow/src/instruments/storage_audio_reader.dart'
+    show getFoldersRecursivly;
 import 'package:audio_flow/src/models/filesystem_entity.dart'
     show FileSystemCustomEntity;
 import 'package:audio_flow/src/ui/elements/app_bar.dart' show AudioFlowAppBar;
@@ -77,7 +78,9 @@ class OpenFilesAndFolders extends HookWidget {
                     ElevatedButton(
                       onPressed: () {
                         settings.currentScanDir = '/storage/emulated/0';
-                        logger.log.d('Files and folders to scan: ${settings.pathsToScan}');
+                        logger.log.d(
+                          'Files and folders to scan: ${settings.pathsToScan}',
+                        );
                         playlistFilesBloc.add(
                           PlaylistFilesOpen(pathsToScan: settings.pathsToScan),
                         );
@@ -138,11 +141,31 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
         value: widget.entity.isChecked,
         onChanged: (_) {
           widget.entity.isChecked = !widget.entity.isChecked;
-          if (widget.entity.isChecked) {
+          if (widget.entity.isChecked && widget.entity.isDir) {
+            var dirs = getFoldersRecursivly(widget.entity);
+            for (var dir in dirs) {
+              settings.pathsToScan.add(dir);
+            }
+          } else if (widget.entity.isChecked) {
             settings.pathsToScan.add(widget.entity);
+          } else if (!widget.entity.isChecked && widget.entity.isDir) {
+            var dirs = getFoldersRecursivly(widget.entity);
+            for (var dir in dirs) {
+              settings.pathsToScan.remove(dir);
+            }
           } else {
             settings.pathsToScan.remove(widget.entity);
           }
+
+          if (widget.entity.name == '..') {
+            logger.log.d('Checkbox near .. activated:');
+            logger.log.d('Current dir: ${settings.currentScanDir}');
+            StorageNavigatorScanEvent(
+              dir: settings.currentScanDir,
+              isChecked: widget.entity.isChecked,
+            );
+          }
+
           setState(() {});
         },
       ),
@@ -160,13 +183,16 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
         ],
       ),
       onTap: () {
-        late String nextDir;
         if (widget.entity.name == '..') {
-          nextDir = widget.entity.fullPath;
-        } else {
-          nextDir =
-              '${settings.currentScanDir}${Platform.pathSeparator}${widget.entity.name}';
+          settings.currentScanDir = widget.entity.fullPath;
+          widget.storageNavigatorBloc.add(
+            StorageNavigatorScanEvent(dir: widget.entity.fullPath, isChecked: false),
+          );
+          return;
         }
+
+        var nextDir =
+            '${settings.currentScanDir}${Platform.pathSeparator}${widget.entity.name}';
         settings.currentScanDir = nextDir;
         logger.log.d('Next scan dir: $nextDir');
         widget.storageNavigatorBloc.add(

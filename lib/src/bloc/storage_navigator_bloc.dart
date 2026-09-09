@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart';
 import 'package:audio_flow/src/models/filesystem_entity.dart'
     show FileSystemCustomEntity;
@@ -27,12 +28,22 @@ class StorageNavigatorBloc
         .toList();
     items.sort((a, b) => a.fullPath.toLowerCase().compareTo(b.fullPath.toLowerCase()));
     if (event.dir != '/storage/emulated/0') {
-      // List<String> pieces = event.dir.split(Platform.pathSeparator);
-      // if (pieces.isNotEmpty) pieces.removeLast();
-      // String parentPath = pieces.join(Platform.pathSeparator);
-      // logger.log.d('parent path is $parentPath');
-
-      items.insert(0, FileSystemCustomEntity(name: '..', fullPath: directory.parent.path, isDir: true));
+      var parentDirList = directory.path.split(Platform.pathSeparator);
+      parentDirList.removeLast();
+      var parentDir = parentDirList.join(Platform.pathSeparator);
+      items.insert(0, FileSystemCustomEntity(name: '..', fullPath: parentDir, isDir: true));
+    }
+    if (event.isChecked) {
+      for (var item in items) {
+        item.isChecked = event.isChecked;
+      }
+    }
+    else {
+      for (var item in items) {
+        if (settings.pathsToScan.contains(item)) {
+          item.isChecked = true;
+        }
+      }
     }
 
     logger.log.d('Current directory is ${event.dir}. Items:');

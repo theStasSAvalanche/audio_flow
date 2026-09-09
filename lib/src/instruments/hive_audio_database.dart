@@ -57,7 +57,7 @@ Future<void> clearPlaylistFromHive(String playlist) async {
 }
 
 Future<void> updatePlaylistToHive(
-  List<FileSystemCustomEntity> pathsToScan,
+  Set<FileSystemCustomEntity> pathsToScan,
   String playlist,
 ) async {
   logger.log.d('Update to Hive');

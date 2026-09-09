@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:io';
 import 'package:audio_flow/src/models/audio_flow_file.dart';
+import 'package:audio_flow/src/models/filesystem_entity.dart';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
@@ -91,4 +92,26 @@ Future<List<String>> readStorageContents(String folderPath) async {
 
 bool checkEntityIsAudio(String entity) {
   return entity.endsWith('.mp3') || entity.endsWith('.flac');
+}
+
+
+List<FileSystemCustomEntity> getFoldersRecursivly(FileSystemCustomEntity folder) {
+  List<FileSystemCustomEntity> directories = [];
+  var directory = Directory(folder.fullPath);
+  late List<FileSystemEntity> entities;
+  try {
+    entities = directory.listSync(recursive: true);
+  }
+  catch (e) {
+    logger.log.e(e);
+  }
+
+  directories.add(folder);
+  for (var entity in entities) {
+    if (entity is Directory) {
+      directories.add(FileSystemCustomEntity.fromEntity(entity));
+    }
+  }
+
+  return directories;
 }

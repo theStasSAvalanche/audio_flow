@@ -47,7 +47,7 @@ class Settings {
   var playlistName = _prefs.getString('playlistName') ?? 'Playlist 1';
   late LazyBox lazyBox;
   late List<AudioFlowFile> audioPlaylist;
-  List<FileSystemCustomEntity> pathsToScan = [];
+  Set<FileSystemCustomEntity> pathsToScan = {};
   String currentScanDir = '/storage/emulated/0';
 
   static final Settings _instance = Settings._internal();

@@ -9,7 +9,7 @@ class PlaylistFilesFromHive extends PlaylistFilesEvent {
   PlaylistFilesFromHive({required this.playlistName});
 }
 class PlaylistFilesOpen extends PlaylistFilesEvent {
-  final List<FileSystemCustomEntity> pathsToScan;
+  final Set<FileSystemCustomEntity> pathsToScan;
   PlaylistFilesOpen({required this.pathsToScan}); 
 }
 
