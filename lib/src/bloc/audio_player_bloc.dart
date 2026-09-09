@@ -17,7 +17,7 @@ part 'audio_player_state.dart';
 class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
   StreamSubscription? tickerSubscription;
 
-  AudioPlayerBloc() : super(AudioPlayerInitial()) {
+  AudioPlayerBloc() : super(AudioPlayerState(isPlaying: false)) {
     on<AudioPlayerStartPlayEvent>(
       _onAudioPlayEvent,
       transformer: restartable(),
@@ -30,7 +30,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       transformer: restartable(),
     );
     on<AudioPlayerStopEvent>(_onAudioStopEvent, transformer: restartable());
-    on<AudioPlayerUpdateStateEvent>(
+    on<AudioPlayerPlayingDetailsEvent>(
       _onAudioUpdateStateEvent,
       transformer: restartable(),
     );
@@ -60,7 +60,6 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     logger.logNS.d('Track album:');
     logger.logNS.d('111: ${track.album}');
 
-    settings.setPlayerStatus(AudioStatus.playing);
     var index = settings.audioPlaylist.indexOf(track);
     settings.setCurrentTrackNumber(index);
     settings.soloud.stopAll();
@@ -70,9 +69,18 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     if (event.startPosition != Duration.zero) {
       settings.soloud.seek(settings.audioHandle!, event.startPosition);
     }
+    settings.setPlayerStatus(AudioStatus.playing);
 
     logger.log.d('Now playing: $track');
-    emit(AudioPlayerStartPlaying(audioTrack: track));
+    var duration = settings.soloud.getLength(settings.audioSource!);
+    emit(
+      AudioPlayerState(
+        audioTrack: track,
+        position: Duration.zero,
+        duration: duration,
+        isPlaying: true,
+      ),
+    );
     tickerSubscription = Stream.periodic(
       const Duration(seconds: 1),
     ).listen((_) => pollPosition(track: track!));
@@ -82,7 +90,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerPauseEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
-    if (state is AudioPlayerStartPlaying && settings.audioHandle != null) {
+    if (settings.audioHandle != null) {
       logger.log.d('Pausing...');
       settings.soloud.setPause(settings.audioHandle!, true);
       await deactivateAudioSession();
@@ -92,7 +100,12 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
         settings.audioHandle!,
       );
       emit(
-        AudioPlayerPaused(audioTrack: state.audioTrack, position: posSeconds),
+        AudioPlayerState(
+          audioTrack: state.audioTrack,
+          position: posSeconds,
+          duration: state.duration,
+          isPlaying: false,
+        ),
       );
     }
   }
@@ -109,18 +122,25 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
 
     settings.soloud.setPause(settings.audioHandle!, false);
     settings.setPlayerStatus(AudioStatus.playing);
-    emit(AudioPlayerStartPlaying(audioTrack: state.audioTrack));
+    emit(
+      AudioPlayerState(
+        audioTrack: state.audioTrack,
+        position: state.position,
+        duration: state.duration,
+        isPlaying: true,
+      ),
+    );
   }
 
   Future<void> _onAudioNextEvent(
     AudioPlayerNextEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
-    if (state is AudioPlayerInitial) {
+    if (settings.audioHandle == null) {
       return;
     }
 
-    if (state is AudioPlayerPaused && !await activateAudioSession()) {
+    if (!await activateAudioSession()) {
       return;
     }
 
@@ -153,11 +173,11 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     AudioPlayerPreviousEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
-    if (state is AudioPlayerInitial) {
+    if (settings.audioHandle == null) {
       return;
     }
 
-    if (state is AudioPlayerPaused && !await activateAudioSession()) {
+    if (!await activateAudioSession()) {
       return;
     }
 
@@ -198,11 +218,18 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     await deactivateAudioSession();
     settings.setCurrentTrackNumber(-1);
     settings.setPlayerStatus(AudioStatus.initial);
-    emit(AudioPlayerInitial());
+    emit(
+      AudioPlayerState(
+        audioTrack: state.audioTrack,
+        position: state.position,
+        duration: state.duration,
+        isPlaying: false,
+      ),
+    );
   }
 
   Future<void> _onAudioUpdateStateEvent(
-    AudioPlayerUpdateStateEvent event,
+    AudioPlayerPlayingDetailsEvent event,
     Emitter<AudioPlayerState> emit,
   ) async {
     var duration = settings.soloud.getLength(settings.audioSource!);
@@ -259,7 +286,9 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       add(AudioPlayerNextEvent());
     }
 
-    add(AudioPlayerUpdateStateEvent(audioTrack: track, position: posSeconds));
+    add(
+      AudioPlayerPlayingDetailsEvent(audioTrack: track, position: posSeconds),
+    );
   }
 
   @override

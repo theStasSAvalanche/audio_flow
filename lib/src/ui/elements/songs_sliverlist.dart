@@ -4,19 +4,16 @@ import 'package:flutter/material.dart';
 
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/configuration/config.dart' show settings;
-import 'package:flutter/rendering.dart' show RenderAbstractViewport;
 import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder;
 
 class SongsListBuilder extends StatelessWidget {
   final AudioPlayerBloc audioPlayerBloc;
   final PlaylistFilesBloc playlistFilesBloc;
-  final ScrollController scrollController;
   final double headerHeight;
   const SongsListBuilder({
     super.key,
     required this.audioPlayerBloc,
     required this.playlistFilesBloc,
-    required this.scrollController,
     required this.headerHeight,
   });
 
@@ -28,7 +25,6 @@ class SongsListBuilder extends StatelessWidget {
           return SongsListView(
             audioPlaylist: state.audioPlaylist,
             audioPlayerBloc: audioPlayerBloc,
-            scrollController: scrollController,
             headerHeight: headerHeight,
           );
       }
@@ -39,13 +35,11 @@ class SongsListBuilder extends StatelessWidget {
 class SongsListView extends StatelessWidget {
   final List<AudioFlowFile> audioPlaylist;
   final AudioPlayerBloc audioPlayerBloc;
-  final ScrollController scrollController;
   final double headerHeight;
   const SongsListView({
     super.key,
     required this.audioPlaylist,
     required this.audioPlayerBloc,
-    required this.scrollController,
     required this.headerHeight,
   });
 
@@ -61,7 +55,6 @@ class SongsListView extends StatelessWidget {
             song: song,
             index: index,
             tileKey: targetSliverKey[index],
-            scrollController: scrollController,
             headerHeight: headerHeight,
           );
         },
@@ -76,7 +69,6 @@ class SongTile extends StatelessWidget {
   final AudioFlowFile song;
   final int index;
   final GlobalKey tileKey; 
-  final ScrollController scrollController;
   final double headerHeight;
   const SongTile({
     super.key,
@@ -84,7 +76,6 @@ class SongTile extends StatelessWidget {
     required this.song,
     required this.index,
     required this.tileKey,
-    required this.scrollController,
     required this.headerHeight,
   });
 
@@ -92,12 +83,9 @@ class SongTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
       buildWhen: (previous, current) {
-        return previous != current || current is AudioPlayerStartPlaying;
+        return previous != current;
       },
       builder: (context, state) {
-        if (song == state.audioTrack) {
-          scrollToSliver(tileKey);
-        }
         return ListTile(
           key: tileKey,
           title: Text(song.toString()),
@@ -118,29 +106,5 @@ class SongTile extends StatelessWidget {
         );
       },
     );
-  }
-
-  void scrollToSliver(GlobalKey key) {
-    final context = key.currentContext;
-    if (context != null) {
-      // Находим RenderBox нужного слейвера
-      final RenderBox renderBox = context.findRenderObject() as RenderBox;
-      
-      // Получаем позицию слейвера относительно Scrollable-родителя
-      final position = renderBox.localToGlobal(
-        Offset(0, -headerHeight), 
-        ancestor: context.findAncestorRenderObjectOfType<RenderAbstractViewport>(),
-      );
-
-      // Вычисляем итоговый offset с учетом текущей прокрутки
-      final targetOffset = scrollController.offset + position.dy;
-
-      // Плавно скроллим
-      scrollController.animateTo(
-        targetOffset,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    }
   }
 }

@@ -22,11 +22,11 @@ class AudioPlayerNextEvent extends AudioPlayerEvent {}
 
 class AudioPlayerPreviousEvent extends AudioPlayerEvent {}
 
-class AudioPlayerUpdateStateEvent extends AudioPlayerEvent {
+class AudioPlayerPlayingDetailsEvent extends AudioPlayerEvent {
   final AudioFlowFile audioTrack;
   final Duration position;
 
-  const AudioPlayerUpdateStateEvent({
+  const AudioPlayerPlayingDetailsEvent({
     required this.audioTrack,
     required this.position,
   });

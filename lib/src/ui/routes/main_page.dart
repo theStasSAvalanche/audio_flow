@@ -14,7 +14,6 @@ import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/ui/elements/songs_sliverlist.dart'
     show SongsListBuilder;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_hooks/flutter_hooks.dart' show HookWidget;
 
 class MainPage extends StatelessWidget {
   final ThemeBloc themeBloc;
@@ -22,10 +21,8 @@ class MainPage extends StatelessWidget {
   final BottomBarBloc bottomBarBloc;
   final PlaylistFilesBloc playlistFilesBloc;
   final PlaylistNameBloc playlistNameBloc;
-  final ScrollController scrollController;
   const MainPage({
     super.key,
-    required this.scrollController,
     required this.themeBloc,
     required this.audioPlayerBloc,
     required this.bottomBarBloc,
@@ -67,12 +64,10 @@ class MainPage extends StatelessWidget {
           Expanded(
             child: CustomScrollView(
               shrinkWrap: true,
-              controller: scrollController,
               slivers: [
                 SongsListBuilder(
                   audioPlayerBloc: audioPlayerBloc,
                   playlistFilesBloc: playlistFilesBloc,
-                  scrollController: scrollController,
                   headerHeight: headerHeight,
                 ),
               ],
@@ -97,37 +92,6 @@ class MainPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class AudioFlowScrollController extends HookWidget {
-  final ThemeBloc themeBloc;
-  final BottomBarBloc bottomBarBloc;
-  final AudioPlayerBloc audioPlayerBloc;
-  final ScrollController scrollController;
-  final PlaylistFilesBloc playlistFilesBloc;
-  final PlaylistNameBloc playlistNameBloc;
-
-  const AudioFlowScrollController({
-    super.key,
-    required this.themeBloc,
-    required this.bottomBarBloc,
-    required this.audioPlayerBloc,
-    required this.scrollController,
-    required this.playlistFilesBloc,
-    required this.playlistNameBloc,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return MainPage(
-      themeBloc: themeBloc,
-      bottomBarBloc: bottomBarBloc,
-      audioPlayerBloc: audioPlayerBloc,
-      scrollController: scrollController,
-      playlistFilesBloc: playlistFilesBloc,
-      playlistNameBloc: playlistNameBloc,
     );
   }
 }

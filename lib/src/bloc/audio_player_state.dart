@@ -30,17 +30,3 @@ class AudioPlayerState extends Equatable {
   @override
   List<Object?> get props => [audioTrack, position, isPlaying];
 }
-
-final class AudioPlayerInitial extends AudioPlayerState {
-  const AudioPlayerInitial() : super(isPlaying: false);
-}
-
-final class AudioPlayerStartPlaying extends AudioPlayerState {
-  const AudioPlayerStartPlaying({required super.audioTrack})
-    : super(position: Duration.zero, isPlaying: true);
-}
-
-final class AudioPlayerPaused extends AudioPlayerState {
-  const AudioPlayerPaused({required super.audioTrack, required super.position})
-    : super(isPlaying: false);
-}

@@ -9,12 +9,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
-import 'package:audio_flow/src/configuration/config.dart'
-    show settings;
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart';
 import 'package:audio_flow/src/ui/theme.dart' show darkTheme, lightTheme;
-import 'package:audio_flow/src/ui/routes/main_page.dart'
-    show AudioFlowScrollController;
+import 'package:audio_flow/src/ui/routes/main_page.dart' show MainPage;
 import 'package:audio_flow/src/ui/elements/app_bar.dart' show AudioFlowAppBar;
 import 'package:audio_flow/src/ui/elements/bottom_bar.dart'
     show AudioFlowBottomBar;
@@ -68,11 +66,10 @@ class AudioFlowMaterial extends StatelessWidget {
                     builder: (context, state) {
                       if (state is PermissionGranted) {
                         // Next Widgets chain associated with songs list builder
-                        return AudioFlowScrollController(
+                        return MainPage(
                           themeBloc: themeBloc,
                           bottomBarBloc: bottomBarBloc,
                           audioPlayerBloc: audioPlayerBloc,
-                          scrollController: ScrollController(),
                           playlistFilesBloc: playlistFilesBloc,
                           playlistNameBloc: playlistNameBloc,
                         );
