@@ -220,9 +220,9 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     settings.setPlayerStatus(AudioStatus.initial);
     emit(
       AudioPlayerState(
-        audioTrack: state.audioTrack,
-        position: state.position,
-        duration: state.duration,
+        audioTrack: null,
+        position: null,
+        duration: null,
         isPlaying: false,
       ),
     );

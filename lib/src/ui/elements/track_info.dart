@@ -35,16 +35,27 @@ class TrackInformation extends StatelessWidget {
                   child: Image.asset('assets/images/album.png'),
                 ),
               ),
-              Column(
-                mainAxisAlignment: .spaceAround,
-                crossAxisAlignment: .center,
-                children: [
-                  Text(artist),
-                  SizedBox(height: headerHeight * 0.025),
-                  Text(album),
-                  SizedBox(height: headerHeight * 0.075),
-                  Text(title),
-                ],
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: .spaceAround,
+                  crossAxisAlignment: .start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(fontSize: 20.0, fontWeight: .w800),
+                    ),
+                    SizedBox(height: headerHeight * 0.075),
+                    Text(
+                      artist,
+                      style: TextStyle(fontSize: 16.0, fontWeight: .w600),
+                    ),
+                    SizedBox(height: headerHeight * 0.025),
+                    Text(
+                      album,
+                      style: TextStyle(fontSize: 16.0, fontWeight: .w500),
+                    ),
+                  ],
+                ),
               ),
             ],
           );
