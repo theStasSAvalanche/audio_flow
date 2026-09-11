@@ -49,72 +49,76 @@ class OpenFilesAndFolders extends HookWidget {
           ),
         ),
       builder: (context, state) {
-        if (state is StorageNavigatorLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return Scaffold(
-            body: Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    physics: const ClampingScrollPhysics(),
-                    itemCount: state.items.length,
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    itemBuilder: (context, index) {
-                      final item = state.items[index];
-                      return SystemEntityTile(
-                        key: ValueKey(item.fullPath),
-                        entity: item,
-                        storageNavigatorBloc: storageNavigatorBloc,
+        return Scaffold(
+          body: Column(
+            children: [
+              Builder(
+                builder: (context) {
+                  if (state is StorageNavigatorLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    return Expanded(
+                      child: ListView.builder(
+                        physics: const ClampingScrollPhysics(),
+                        itemCount: state.items.length,
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        itemBuilder: (context, index) {
+                          final item = state.items[index];
+                          return SystemEntityTile(
+                            key: ValueKey(item.fullPath),
+                            entity: item,
+                            storageNavigatorBloc: storageNavigatorBloc,
+                          );
+                        },
+                      ),
+                    );
+                  }
+                },
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: .spaceEvenly,
+                crossAxisAlignment: .center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      settings.currentScanDir = '/storage/emulated/0';
+                      logger.log.d(
+                        'Files and folders to scan: ${settings.pathsToScan}',
                       );
+                      playlistFilesBloc.add(
+                        PlaylistFilesOpen(pathsToScan: settings.pathsToScan),
+                      );
+                      Navigator.pop(context);
                     },
+                    child: const Text('Add'),
                   ),
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: .spaceEvenly,
-                  crossAxisAlignment: .center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        settings.currentScanDir = '/storage/emulated/0';
-                        logger.log.d(
-                          'Files and folders to scan: ${settings.pathsToScan}',
-                        );
-                        playlistFilesBloc.add(
-                          PlaylistFilesOpen(pathsToScan: settings.pathsToScan),
-                        );
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Add'),
-                    ),
-                    SizedBox(),
-                    ElevatedButton(
-                      onPressed: () {
-                        settings.currentScanDir = '/storage/emulated/0';
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Cancel'),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-              ],
-            ),
-            appBar: AudioFlowAppBar(themeBloc: themeBloc),
-            drawer: AudioFlowDrawer(
-              playlistNameBloc: playlistNameBloc,
-            ), // Left-sided menu
-            bottomNavigationBar: AudioFlowBottomBar(
-              audioPlayerBloc: audioPlayerBloc,
-              bottomBarBloc: bottomBarBloc,
-            ),
-            floatingActionButtonLocation: .centerDocked,
-            floatingActionButton: AudioFlowFloatingActionButton(
-              audioPlayerBloc: audioPlayerBloc,
-            ),
-          );
-        }
+                  SizedBox(),
+                  ElevatedButton(
+                    onPressed: () {
+                      settings.currentScanDir = '/storage/emulated/0';
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+            ],
+          ),
+          appBar: AudioFlowAppBar(themeBloc: themeBloc),
+          drawer: AudioFlowDrawer(
+            playlistNameBloc: playlistNameBloc,
+          ), // Left-sided menu
+          bottomNavigationBar: AudioFlowBottomBar(
+            audioPlayerBloc: audioPlayerBloc,
+            bottomBarBloc: bottomBarBloc,
+          ),
+          floatingActionButtonLocation: .centerDocked,
+          floatingActionButton: AudioFlowFloatingActionButton(
+            audioPlayerBloc: audioPlayerBloc,
+          ),
+        );
       },
     );
   }
@@ -186,7 +190,10 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
         if (widget.entity.name == '..') {
           settings.currentScanDir = widget.entity.fullPath;
           widget.storageNavigatorBloc.add(
-            StorageNavigatorScanEvent(dir: widget.entity.fullPath, isChecked: false),
+            StorageNavigatorScanEvent(
+              dir: widget.entity.fullPath,
+              isChecked: false,
+            ),
           );
           return;
         }
