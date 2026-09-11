@@ -1,5 +1,4 @@
 import 'package:audio_flow/hive/hive_registrar.g.dart' show HiveRegistrar;
-import 'package:audio_session/audio_session.dart' show AudioSession, AudioSessionConfiguration;
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
