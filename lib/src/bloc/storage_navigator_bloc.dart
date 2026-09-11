@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart';
+import 'package:audio_flow/src/instruments/storage_audio_reader.dart' show checkEntityIsAudio;
 import 'package:audio_flow/src/models/filesystem_entity.dart'
     show FileSystemCustomEntity;
 import 'package:bloc/bloc.dart';
@@ -26,6 +27,9 @@ class StorageNavigatorBloc
     List<FileSystemEntity> entities = directory.listSync(recursive: false);
     List<FileSystemCustomEntity> items = [];
     for (var entity in entities) {
+      if (entity is File && !checkEntityIsAudio(entity.path)) {
+        continue;
+      }
       var item = FileSystemCustomEntity.fromEntity(entity);
       if (event.isChecked) {
         item.isChecked = event.isChecked;
@@ -48,9 +52,7 @@ class StorageNavigatorBloc
     
 
     logger.logNS.d('Current directory is ${event.dir}. Items:');
-    for (var item in items) {
-      logger.logNS.d('$item : ${item.isChecked}');
-    }
+    logger.logNS.d(items);
 
     emit(StorageNavigatorCurrentState(items: items));
   }
