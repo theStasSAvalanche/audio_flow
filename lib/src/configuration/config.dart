@@ -1,6 +1,6 @@
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
 import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
-import 'package:audio_session/audio_session.dart' show AudioSession;
+import 'package:audio_session/audio_session.dart' show AudioSession, AudioSessionConfiguration, AndroidAudioContentType, AndroidAudioUsage, AndroidAudioAttributes, AndroidAudioFocusGainType;
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:logger/logger.dart' show Level;
@@ -64,6 +64,19 @@ class Settings {
 
   Future<void> initLazyBox() async {
     lazyBox = await Hive.openLazyBox(settings.playlistName);
+  }
+
+  Future<AudioSession> initAudioSession() async {
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      androidAudioAttributes: AndroidAudioAttributes(
+      contentType: AndroidAudioContentType.music,
+      usage: AndroidAudioUsage.media,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+    ));
+
+    return session;
   }
 
   Future<void> initSoloud() async {

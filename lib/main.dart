@@ -15,8 +15,7 @@ void main() async {
   await settings.initLazyBox();
   // settings.clearAllSettings();
   await initLogger();
-  settings.audioSession = await AudioSession.instance;
-  await settings.audioSession.configure(AudioSessionConfiguration.music());
+  settings.audioSession = await settings.initAudioSession();
   settings.setPlayerStatus(AudioStatus.initial);
   await settings.initSoloud();
   logger.log.d('Application started');
