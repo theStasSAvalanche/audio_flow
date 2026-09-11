@@ -51,6 +51,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <!-- Background service always works-->
+    <uses-permission android:name="android:permission="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 </manifest>

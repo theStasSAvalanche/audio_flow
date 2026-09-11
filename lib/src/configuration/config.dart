@@ -1,6 +1,6 @@
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
 import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
-import 'package:audio_session/audio_session.dart' show AudioSession, AudioSessionConfiguration, AndroidAudioContentType, AndroidAudioUsage, AndroidAudioAttributes, AndroidAudioFocusGainType;
+import 'package:audio_session/audio_session.dart' show AVAudioSessionCategoryOptions, AndroidAudioAttributes, AndroidAudioContentType, AndroidAudioFocusGainType, AndroidAudioUsage, AudioSession, AudioSessionConfiguration, AVAudioSessionCategory;
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:logger/logger.dart' show Level;
@@ -74,6 +74,7 @@ class Settings {
       usage: AndroidAudioUsage.media,
       ),
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      avAudioSessionCategory: AVAudioSessionCategory.playback
     ));
 
     return session;
