@@ -40,6 +40,7 @@ class AudioFlowMaterial extends StatelessWidget {
     final bottomBarBloc = BottomBarBloc();
     final playlistFilesBloc = PlaylistFilesBloc();
     final playlistNameBloc = PlaylistNameBloc();
+    final permissionBloc = PermissionBloc();
 
     return MultiBlocProvider(
       providers: [
@@ -48,6 +49,7 @@ class AudioFlowMaterial extends StatelessWidget {
         BlocProvider<BottomBarBloc>(create: (context) => bottomBarBloc),
         BlocProvider<PlaylistFilesBloc>(create: (context) => playlistFilesBloc),
         BlocProvider<PlaylistNameBloc>(create: (context) => playlistNameBloc),
+        BlocProvider<PermissionBloc>(create: (create) => permissionBloc),
       ],
       child: BlocBuilder<ThemeBloc, ThemeMode>(
         bloc: themeBloc,
@@ -60,41 +62,47 @@ class AudioFlowMaterial extends StatelessWidget {
             home: Scaffold(
               appBar: AudioFlowAppBar(themeBloc: themeBloc),
               body: SafeArea(
-                child: BlocProvider(
-                  create: (context) => PermissionBloc(),
-                  child: BlocBuilder<PermissionBloc, PermissionState>(
-                    builder: (context, state) {
-                      if (state is PermissionGranted) {
-                        // Next Widgets chain associated with songs list builder
-                        return MainPage(
-                          themeBloc: themeBloc,
-                          bottomBarBloc: bottomBarBloc,
-                          audioPlayerBloc: audioPlayerBloc,
-                          playlistFilesBloc: playlistFilesBloc,
-                          playlistNameBloc: playlistNameBloc,
-                        );
-                      } else if (state is PermissionDenied) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                "Permission Denied.",
-                                style: TextStyle(fontSize: 20.0),
+                child: BlocBuilder<PermissionBloc, PermissionState>(
+                  bloc: permissionBloc,
+                  builder: (context, state) {
+                    if (state is PermissionGranted) {
+                      // Next Widgets chain associated with songs list builder
+                      return MainPage(
+                        themeBloc: themeBloc,
+                        bottomBarBloc: bottomBarBloc,
+                        audioPlayerBloc: audioPlayerBloc,
+                        playlistFilesBloc: playlistFilesBloc,
+                        playlistNameBloc: playlistNameBloc,
+                      );
+                    } else if (state is PermissionDenied) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Permission Denied.",
+                              style: TextStyle(fontSize: 20.0),
+                            ),
+                            SizedBox(height: 16),
+                            FloatingActionButton.extended(
+                              onPressed: () => openAppSettings(),
+                              icon: const Icon(Icons.settings),
+                              label: const Text("Settings"),
+                            ),
+                            SizedBox(height: 16),
+                            FloatingActionButton.extended(
+                              onPressed: () => permissionBloc.add(
+                                RequestPermissionEvent(),
                               ),
-                              SizedBox(height: 16,),
-                              FloatingActionButton.extended(
-                                onPressed: () => openAppSettings(),
-                                icon: const Icon(Icons.settings),
-                                label: const Text("Settings"),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                  ),
+                              icon: const Icon(Icons.refresh),
+                              label: const Text("Refresh"),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  },
                 ),
               ),
               drawer: AudioFlowDrawer(
