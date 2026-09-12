@@ -48,6 +48,7 @@ class Settings {
   late LazyBox lazyBox;
   late List<AudioFlowFile> audioPlaylist;
   Set<FileSystemCustomEntity> pathsToScan = {};
+  Set<FileSystemCustomEntity> semiCheckedPaths = {};
   String currentScanDir = '/storage/emulated/0';
 
   static final Settings _instance = Settings._internal();

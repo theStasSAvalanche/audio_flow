@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/models/audio_flow_file.dart';
 import 'package:audio_flow/src/models/filesystem_entity.dart';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
@@ -114,4 +115,17 @@ List<FileSystemCustomEntity> getFoldersRecursivly(FileSystemCustomEntity folder)
   }
 
   return directories;
+}
+
+void setParentDirectoriesSemiChecked(FileSystemCustomEntity entity, String rootDir) {
+  var items = entity.fullPath.split(Platform.pathSeparator);
+  items.removeLast();
+  var item = items.join(Platform.pathSeparator);
+  while(item != rootDir) {
+    var dir = Directory(item);
+    var customItem = FileSystemCustomEntity.fromEntity(dir);
+    settings.semiCheckedPaths.add(customItem);
+    items.removeLast();
+    item = items.join(Platform.pathSeparator);
+  }
 }

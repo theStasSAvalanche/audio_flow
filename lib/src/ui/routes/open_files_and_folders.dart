@@ -9,7 +9,7 @@ import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:audio_flow/src/instruments/storage_audio_reader.dart'
-    show getFoldersRecursivly;
+    show getFoldersRecursivly, setParentDirectoriesSemiChecked;
 import 'package:audio_flow/src/models/filesystem_entity.dart'
     show FileSystemCustomEntity;
 import 'package:audio_flow/src/ui/elements/app_bar.dart' show AudioFlowAppBar;
@@ -142,23 +142,33 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Checkbox(
+        tristate: true,
         value: widget.entity.isChecked,
         onChanged: (_) {
-          widget.entity.isChecked = !widget.entity.isChecked;
-          if (widget.entity.isChecked && widget.entity.isDir) {
+          if (widget.entity.isChecked == null || !widget.entity.isChecked!) {
+            widget.entity.isChecked = true;
+          }
+          else {
+            widget.entity.isChecked = false;
+          }
+          if (widget.entity.isChecked! && widget.entity.isDir) {
             var dirs = getFoldersRecursivly(widget.entity);
             for (var dir in dirs) {
               settings.pathsToScan.add(dir);
+              settings.semiCheckedPaths.remove(dir);
             }
-          } else if (widget.entity.isChecked) {
+          } else if (widget.entity.isChecked!) {
             settings.pathsToScan.add(widget.entity);
-          } else if (!widget.entity.isChecked && widget.entity.isDir) {
+            setParentDirectoriesSemiChecked(widget.entity, '/storage/emulated/0');
+          } else if (!widget.entity.isChecked! && widget.entity.isDir) {
             var dirs = getFoldersRecursivly(widget.entity);
             for (var dir in dirs) {
               settings.pathsToScan.remove(dir);
             }
+            setParentDirectoriesSemiChecked(widget.entity, '/storage/emulated/0');
           } else {
             settings.pathsToScan.remove(widget.entity);
+            setParentDirectoriesSemiChecked(widget.entity, '/storage/emulated/0');
           }
 
           if (widget.entity.name == '..') {
@@ -166,7 +176,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
             logger.log.d('Current dir: ${settings.currentScanDir}');
             StorageNavigatorScanEvent(
               dir: settings.currentScanDir,
-              isChecked: widget.entity.isChecked,
+              isChecked: widget.entity.isChecked!,
             );
           }
 
@@ -205,7 +215,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
         widget.storageNavigatorBloc.add(
           StorageNavigatorScanEvent(
             dir: nextDir,
-            isChecked: widget.entity.isChecked,
+            isChecked: widget.entity.isChecked!,
           ),
         );
       },

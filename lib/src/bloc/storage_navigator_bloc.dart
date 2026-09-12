@@ -1,4 +1,3 @@
-// TODO: create middle checkbox state then unchecked some subpaths in deeper
 import 'dart:io';
 
 import 'package:audio_flow/src/configuration/config.dart' show settings;
@@ -33,6 +32,9 @@ class StorageNavigatorBloc
       var item = FileSystemCustomEntity.fromEntity(entity);
       if (event.isChecked) {
         item.isChecked = event.isChecked;
+      }
+      else if (settings.semiCheckedPaths.contains(item)) {
+        item.isChecked = null;
       }
       else if (settings.pathsToScan.contains(item)) {
         item.isChecked = true;
