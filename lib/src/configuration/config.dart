@@ -46,7 +46,7 @@ class Settings {
   // Playlist structures
   var playlistName = _prefs.getString('playlistName') ?? 'Playlist 1';
   late LazyBox lazyBox;
-  late List<AudioFlowFile> audioPlaylist;
+  List<AudioFlowFile> audioPlaylist = [];
   Set<FileSystemCustomEntity> pathsToScan = {};
   Set<FileSystemCustomEntity> semiCheckedPaths = {};
   String localStorage = '/storage/emulated/0';

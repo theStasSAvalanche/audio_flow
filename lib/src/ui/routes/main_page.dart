@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/bloc/bottom_bar_bloc.dart';
 import 'package:audio_flow/src/bloc/playlist_files_bloc.dart';
@@ -5,12 +7,14 @@ import 'package:audio_flow/src/bloc/playlist_name_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/ui/elements/playlists_top_menu.dart'
     show PlayListMenu;
-import 'package:audio_flow/src/ui/elements/track_info.dart' show TrackInformation;
+import 'package:audio_flow/src/ui/elements/track_info.dart'
+    show TrackInformation;
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart'
     show ProgressBar;
 import 'package:flutter/material.dart';
 
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
+import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/ui/elements/songs_sliverlist.dart'
     show SongsListBuilder;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,15 +44,19 @@ class MainPage extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: .start,
-        crossAxisAlignment: .center,
-        children: [
-          TrackInformation(audioPlayerBloc: audioPlayerBloc, headerHeight: headerHeight),
-          BlocBuilder<PlaylistFilesBloc, PlaylistFilesState>(
-            bloc: playlistFilesBloc,
-            builder: (context, state) {
-              return SizedBox(
+      child: BlocBuilder<PlaylistFilesBloc, PlaylistFilesState>(
+        bloc: playlistFilesBloc
+          ..add(PlaylistFilesFromHive(playlistName: settings.playlistName)),
+        builder: (context, state) {
+          return Column(
+            mainAxisAlignment: .start,
+            crossAxisAlignment: .center,
+            children: [
+              TrackInformation(
+                audioPlayerBloc: audioPlayerBloc,
+                headerHeight: headerHeight,
+              ),
+              SizedBox(
                 height: headerHeight * 0.15,
                 child: PlayListMenu(
                   headerHeight: headerHeight,
@@ -58,39 +66,78 @@ class MainPage extends StatelessWidget {
                   playlistFilesBloc: playlistFilesBloc,
                   playlistNameBloc: playlistNameBloc,
                 ),
-              );
-            },
-          ),
-          Expanded(
-            child: CustomScrollView(
-              shrinkWrap: true,
-              slivers: [
-                SongsListBuilder(
-                  audioPlayerBloc: audioPlayerBloc,
-                  playlistFilesBloc: playlistFilesBloc,
-                  headerHeight: headerHeight,
-                ),
-              ],
-            ),
-          ),
-          BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
-            bloc: audioPlayerBloc,
-            builder: (context, state) {
-              return ProgressBar(
-                barHeight: 8.0,
-                progress: state.position ?? Duration.zero,
-                total: state.duration ?? Duration.zero,
-                onSeek: (newPosition) {
-                  audioPlayerBloc.add(
-                    AudioPlayerSeekPositionEvent(
-                      position: newPosition,
+              ),
+              SizedBox(
+                child: Column(
+                  children: [
+                    Builder(
+                      builder: (BuildContext innerContext) {
+                        if (settings.audioPlaylist.isNotEmpty) {
+                          var currentItem = settings.audioPlaylist.first;
+                          var currentParent = currentItem.filePath.split(
+                            Platform.pathSeparator,
+                          )..removeLast();
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: SizedBox(
+                              height: 48,
+                              child: Column(
+                                mainAxisAlignment: .end,
+                                crossAxisAlignment: .start,
+                                children: [
+                                  Text(
+                                    currentParent.last,
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: .w600,
+                                    ),
+                                  ),
+                                  Divider(color: Colors.grey, thickness: 2),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        return const Divider(
+                          color: Colors.grey,
+                          thickness: 0.5,
+                        );
+                      },
                     ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: CustomScrollView(
+                  shrinkWrap: true,
+                  slivers: [
+                    SongsListBuilder(
+                      audioPlayerBloc: audioPlayerBloc,
+                      playlistFilesBloc: playlistFilesBloc,
+                      headerHeight: headerHeight,
+                    ),
+                  ],
+                ),
+              ),
+              BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
+                bloc: audioPlayerBloc,
+                builder: (context, state) {
+                  return ProgressBar(
+                    barHeight: 8.0,
+                    progress: state.position ?? Duration.zero,
+                    total: state.duration ?? Duration.zero,
+                    onSeek: (newPosition) {
+                      audioPlayerBloc.add(
+                        AudioPlayerSeekPositionEvent(position: newPosition),
+                      );
+                    },
                   );
                 },
-              );
-            },
-          ),
-        ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
