@@ -53,6 +53,7 @@ dependencies:
   equatable: ^2.1.0
   audio_video_progress_bar: ^2.0.3
   device_info_plus: ^13.2.0
+  audio_service: ^0.18.19
 dev_dependencies:
   flutter_test:
     sdk: flutter
