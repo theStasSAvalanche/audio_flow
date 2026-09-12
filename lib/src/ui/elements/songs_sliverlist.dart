@@ -80,7 +80,11 @@ class SongsListView extends StatelessWidget {
                 children: [
                   Text(
                     nextParent.last,
-                    style: TextStyle(fontSize: 18.0, fontWeight: .w600),
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: .w600,
+                      color: Colors.blue,
+                    ),
                   ),
                   Divider(color: Colors.grey, thickness: 2),
                 ],
@@ -120,7 +124,7 @@ class SongTile extends StatelessWidget {
       builder: (context, state) {
         return ListTile(
           key: tileKey,
-          title: Text(song.title),
+          title: Text('${index + 1}. ${song.title}'),
           subtitle: Text('${song.artist} - ${song.album}'),
           selectedTileColor: Colors.lightBlue.withValues(alpha: 0.3),
           selected: song == state.audioTrack,

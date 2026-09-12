@@ -67,51 +67,55 @@ class MainPage extends StatelessWidget {
                   playlistNameBloc: playlistNameBloc,
                 ),
               ),
-              SizedBox(
-                child: Column(
-                  children: [
-                    Builder(
-                      builder: (BuildContext innerContext) {
-                        if (settings.audioPlaylist.isNotEmpty) {
-                          var currentItem = settings.audioPlaylist.first;
-                          var currentParent = currentItem.filePath.split(
-                            Platform.pathSeparator,
-                          )..removeLast();
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: SizedBox(
-                              height: 48,
-                              child: Column(
-                                mainAxisAlignment: .end,
-                                crossAxisAlignment: .start,
-                                children: [
-                                  Text(
-                                    currentParent.last,
-                                    style: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: .w600,
-                                    ),
-                                  ),
-                                  Divider(color: Colors.grey, thickness: 2),
-                                ],
-                              ),
-                            ),
-                          );
-                        }
-
-                        return const Divider(
-                          color: Colors.grey,
-                          thickness: 0.5,
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
               Expanded(
                 child: CustomScrollView(
                   shrinkWrap: true,
                   slivers: [
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          Builder(
+                            builder: (BuildContext innerContext) {
+                              if (settings.audioPlaylist.isNotEmpty) {
+                                var currentItem = settings.audioPlaylist.first;
+                                var currentParent = currentItem.filePath.split(
+                                  Platform.pathSeparator,
+                                )..removeLast();
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: SizedBox(
+                                    height: 48,
+                                    child: Column(
+                                      mainAxisAlignment: .end,
+                                      crossAxisAlignment: .start,
+                                      children: [
+                                        Text(
+                                          currentParent.last,
+                                          style: TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: .w600,
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                        Divider(
+                                          color: Colors.grey,
+                                          thickness: 2,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return const Divider(
+                                color: Colors.grey,
+                                thickness: 0.5,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                     SongsListBuilder(
                       audioPlayerBloc: audioPlayerBloc,
                       playlistFilesBloc: playlistFilesBloc,
