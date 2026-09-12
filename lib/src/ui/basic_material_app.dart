@@ -79,11 +79,14 @@ class AudioFlowMaterial extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                "Permission Denied. Please enable it in settings.",
+                                "Permission Denied.",
+                                style: TextStyle(fontSize: 20.0),
                               ),
-                              ElevatedButton(
+                              SizedBox(height: 16,),
+                              FloatingActionButton.extended(
                                 onPressed: () => openAppSettings(),
-                                child: const Text("Open Settings"),
+                                icon: const Icon(Icons.settings),
+                                label: const Text("Settings"),
                               ),
                             ],
                           ),

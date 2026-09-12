@@ -82,7 +82,7 @@ class OpenFilesAndFolders extends HookWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      settings.currentScanDir = '/storage/emulated/0';
+                      settings.currentScanDir = settings.localStorage;
                       logger.log.d(
                         'Files and folders to scan: ${settings.pathsToScan}',
                       );
@@ -96,7 +96,7 @@ class OpenFilesAndFolders extends HookWidget {
                   SizedBox(),
                   ElevatedButton(
                     onPressed: () {
-                      settings.currentScanDir = '/storage/emulated/0';
+                      settings.currentScanDir = settings.localStorage;
                       Navigator.pop(context);
                     },
                     child: const Text('Cancel'),
@@ -159,16 +159,16 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
             }
           } else if (widget.entity.isChecked!) {
             settings.pathsToScan.add(widget.entity);
-            setParentDirectoriesSemiChecked(widget.entity, '/storage/emulated/0');
+            setParentDirectoriesSemiChecked(widget.entity, settings.localStorage);
           } else if (!widget.entity.isChecked! && widget.entity.isDir) {
             var dirs = getFoldersRecursivly(widget.entity);
             for (var dir in dirs) {
               settings.pathsToScan.remove(dir);
             }
-            setParentDirectoriesSemiChecked(widget.entity, '/storage/emulated/0');
+            setParentDirectoriesSemiChecked(widget.entity, settings.localStorage);
           } else {
             settings.pathsToScan.remove(widget.entity);
-            setParentDirectoriesSemiChecked(widget.entity, '/storage/emulated/0');
+            setParentDirectoriesSemiChecked(widget.entity, settings.localStorage);
           }
 
           if (widget.entity.name == '..') {
