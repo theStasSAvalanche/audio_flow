@@ -100,6 +100,7 @@ class OpenFilesAndFolders extends HookWidget {
                       settings.currentScanDir = settings.localStorage;
                       settings.pathsToScan.clear();
                       settings.semiCheckedPaths.clear();
+                      settings.uncheckedFiles.clear();
                       Navigator.pop(context);
                     },
                   ),
@@ -153,6 +154,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
           else {
             widget.entity.isChecked = false;
           }
+
           if (widget.entity.isChecked! && widget.entity.isDir) {
             var dirs = getFoldersRecursivly(widget.entity);
             for (var dir in dirs) {
@@ -161,6 +163,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
             }
           } else if (widget.entity.isChecked!) {
             settings.pathsToScan.add(widget.entity);
+            settings.uncheckedFiles.remove(widget.entity.fullPath);
             setParentDirectoriesSemiChecked(widget.entity, settings.localStorage);
           } else if (!widget.entity.isChecked! && widget.entity.isDir) {
             var dirs = getFoldersRecursivly(widget.entity);
@@ -170,6 +173,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
             setParentDirectoriesSemiChecked(widget.entity, settings.localStorage);
           } else {
             settings.pathsToScan.remove(widget.entity);
+            settings.uncheckedFiles.add(widget.entity.fullPath);
             setParentDirectoriesSemiChecked(widget.entity, settings.localStorage);
           }
 

@@ -20,15 +20,16 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(
       .toList();
   var defaultAlbumDir = await getDirectoryAlbumPicture(audioDir);
   for (var entity in entities) {
+    if (entity is File && settings.uncheckedFiles.contains(entity.path)) {
+      continue;
+    }
+    
     if (entity is File && checkEntityIsAudio(entity.path)) {
       try {
         var audioFile = AudioFlowFile.fromMetadata(
           metadata: await readMp3Tags(entity),
         );
         audioFile.directoryPicture = defaultAlbumDir;
-        logger.logNS.d('audio file: $audioFile');
-        logger.logNS.d('Image: ${audioFile.directoryPicture}');
-
         audioDatabase.putIfAbsent(folder, () => []).add(audioFile);
       } catch (e) {
         logger.log.e(e);
@@ -55,8 +56,6 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFile(
     var audioFile = AudioFlowFile.fromMetadata(metadata: await readMp3Tags(f));
     var defaultAlbumDir = await getDirectoryAlbumPicture(Directory(parentDir));
     audioFile.directoryPicture = defaultAlbumDir;
-    logger.logNS.d('audio file: $audioFile');
-    logger.logNS.d('Image: ${audioFile.directoryPicture}');
     audioDatabase.putIfAbsent(parentDir, () => []).add(audioFile);
   } catch (e) {
     logger.log.e(e);
