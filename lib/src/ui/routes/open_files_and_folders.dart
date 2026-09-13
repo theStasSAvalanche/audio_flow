@@ -209,6 +209,8 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
         },
       ),
       title: Row(
+        mainAxisAlignment: .start,
+        crossAxisAlignment: .start,
         children: [
           Icon(
             widget.entity.isDir
@@ -218,7 +220,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
                 : Icons.audio_file,
           ),
           SizedBox(width: 8),
-          Text(widget.entity.name),
+          Expanded(child: Text(widget.entity.name)),
         ],
       ),
       onTap: () {
