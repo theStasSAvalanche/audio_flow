@@ -57,8 +57,6 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     if (track == null) {
       return;
     }
-    logger.logNS.d('Track album:');
-    logger.logNS.d('111: ${track.album}');
 
     var index = settings.audioPlaylist.indexOf(track);
     settings.setCurrentTrackNumber(index);

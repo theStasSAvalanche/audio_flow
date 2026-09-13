@@ -23,14 +23,15 @@ class AudioFlowFileAdapter extends TypeAdapter<AudioFlowFile> {
       ..artist = fields[2] as String?
       ..album = fields[3] as String?
       ..albumArt = fields[4] as Uint8List?
-      ..duration = fields[5] as String?
-      ..trackNumber = (fields[6] as num?)?.toInt();
+      ..directoryPicture = fields[5] as String?
+      ..duration = fields[6] as String?
+      ..trackNumber = (fields[7] as num?)?.toInt();
   }
 
   @override
   void write(BinaryWriter writer, AudioFlowFile obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.filePath)
       ..writeByte(1)
@@ -42,8 +43,10 @@ class AudioFlowFileAdapter extends TypeAdapter<AudioFlowFile> {
       ..writeByte(4)
       ..write(obj.albumArt)
       ..writeByte(5)
-      ..write(obj.duration)
+      ..write(obj.directoryPicture)
       ..writeByte(6)
+      ..write(obj.duration)
+      ..writeByte(7)
       ..write(obj.trackNumber);
   }
 

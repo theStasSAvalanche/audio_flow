@@ -34,6 +34,7 @@ class PlaylistFilesBloc extends Bloc<PlaylistFilesEvent, PlaylistFilesState> {
     emit(PlaylistFilesLoading());
     await updatePlaylistToHive(event.pathsToScan, settings.playlistName);
     settings.pathsToScan.clear();
+    settings.semiCheckedPaths.clear();
 
     add(PlaylistFilesFromHive(playlistName: settings.playlistName));
   }

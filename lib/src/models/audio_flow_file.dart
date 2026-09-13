@@ -9,6 +9,7 @@ class AudioFlowFile {
   String? artist;
   String? album;
   Uint8List? albumArt;
+  String? directoryPicture;
   String? duration;
   int? trackNumber;
 

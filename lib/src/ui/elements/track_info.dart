@@ -1,4 +1,7 @@
+import 'dart:io' show File;
+
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
+import 'package:audio_flow/src/configuration/logger.dart' show logger;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder;
 
@@ -23,6 +26,20 @@ class TrackInformation extends StatelessWidget {
           var artist = state.audioTrack?.artist ?? '';
           var album = state.audioTrack?.album ?? '';
           var title = state.audioTrack?.title ?? '';
+          var albumArt = Image.asset('assets/images/album.png');
+          if (state.audioTrack?.albumArt != null) {
+            albumArt = Image.memory(state.audioTrack!.albumArt!);
+          } else if (state.audioTrack?.directoryPicture != null) {
+            albumArt = Image.file(
+              File(state.audioTrack!.directoryPicture!),
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                logger.log.e(error);
+                return Text('Image was not loaded');
+              },
+            );
+          }
+
           return Row(
             children: [
               SizedBox(
@@ -32,9 +49,10 @@ class TrackInformation extends StatelessWidget {
                     Theme.of(context).scaffoldBackgroundColor,
                     BlendMode.dstOver,
                   ),
-                  child: Image.asset('assets/images/album.png'),
+                  child: albumArt,
                 ),
               ),
+              SizedBox(width: 8),
               Expanded(
                 child: Column(
                   mainAxisAlignment: .spaceAround,

@@ -5,7 +5,7 @@ nextTypeId: 1
 types:
   AudioFlowFile:
     typeId: 0
-    nextIndex: 7
+    nextIndex: 8
     fields:
       filePath:
         index: 0
@@ -17,7 +17,9 @@ types:
         index: 3
       albumArt:
         index: 4
-      duration:
+      directoryPicture:
         index: 5
-      trackNumber:
+      duration:
         index: 6
+      trackNumber:
+        index: 7

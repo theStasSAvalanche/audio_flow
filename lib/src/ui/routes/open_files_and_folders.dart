@@ -81,6 +81,7 @@ class OpenFilesAndFolders extends HookWidget {
                 crossAxisAlignment: .center,
                 children: [
                   ElevatedButton(
+                    child: const Text('Add'),
                     onPressed: () {
                       settings.currentScanDir = settings.localStorage;
                       logger.log.d(
@@ -91,15 +92,16 @@ class OpenFilesAndFolders extends HookWidget {
                       );
                       Navigator.pop(context);
                     },
-                    child: const Text('Add'),
                   ),
                   SizedBox(),
                   ElevatedButton(
+                    child: const Text('Cancel'),
                     onPressed: () {
                       settings.currentScanDir = settings.localStorage;
+                      settings.pathsToScan.clear();
+                      settings.semiCheckedPaths.clear();
                       Navigator.pop(context);
                     },
-                    child: const Text('Cancel'),
                   ),
                 ],
               ),
@@ -215,7 +217,7 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
         widget.storageNavigatorBloc.add(
           StorageNavigatorScanEvent(
             dir: nextDir,
-            isChecked: widget.entity.isChecked!,
+            isChecked: widget.entity.isChecked ?? false,
           ),
         );
       },

@@ -24,21 +24,26 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
     logger.log.d("Android SDK Version: $sdkVersion");
 
     late PermissionStatus status;
+    late PermissionStatus status2;
     if (sdkVersion >= 33) {
       status = await Permission.audio.status;
+      status2 = await Permission.photos.status;
 
       if (!status.isGranted) {
         status = await Permission.audio.request();
       }
-    }
-    else {
+      if (!status2.isGranted) {
+        status2 = await Permission.photos.request();
+      }
+    } else {
       status = await Permission.storage.status;
 
       if (!status.isGranted) {
         status = await Permission.storage.request();
       }
     }
-    if (status.isGranted) {
+    if (status.isGranted ||
+        (sdkVersion >= 33 && status.isGranted && status2.isGranted)) {
       emit(PermissionGranted());
     } else {
       emit(PermissionDenied());
