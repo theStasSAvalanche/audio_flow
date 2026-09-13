@@ -1,5 +1,3 @@
-import 'dart:io' show FileSystemEntity;
-
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
 import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
 import 'package:audio_session/audio_session.dart' show AndroidAudioAttributes, AndroidAudioContentType, AndroidAudioFocusGainType, AndroidAudioUsage, AudioSession, AudioSessionConfiguration, AVAudioSessionCategory;
