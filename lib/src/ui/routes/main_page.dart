@@ -56,21 +56,23 @@ class MainPage extends StatelessWidget {
                 audioPlayerBloc: audioPlayerBloc,
                 headerHeight: headerHeight,
               ),
-              SizedBox(
-                height: headerHeight * 0.15,
-                child: PlayListMenu(
-                  headerHeight: headerHeight,
-                  themeBloc: themeBloc,
-                  audioPlayerBloc: audioPlayerBloc,
-                  bottomBarBloc: bottomBarBloc,
-                  playlistFilesBloc: playlistFilesBloc,
-                  playlistNameBloc: playlistNameBloc,
-                ),
-              ),
               Expanded(
                 child: CustomScrollView(
                   shrinkWrap: true,
                   slivers: [
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: headerHeight * 0.15,
+                        child: PlayListMenu(
+                          headerHeight: headerHeight,
+                          themeBloc: themeBloc,
+                          audioPlayerBloc: audioPlayerBloc,
+                          bottomBarBloc: bottomBarBloc,
+                          playlistFilesBloc: playlistFilesBloc,
+                          playlistNameBloc: playlistNameBloc,
+                        ),
+                      ),
+                    ),
                     SliverToBoxAdapter(
                       child: Column(
                         children: [

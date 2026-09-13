@@ -109,6 +109,27 @@ bool checkEntityIsAudio(String entity) {
   return entity.endsWith('.mp3') || entity.endsWith('.flac');
 }
 
+List<FileSystemCustomEntity> getItemsRecursivly(
+  FileSystemCustomEntity folder,
+) {
+  List<FileSystemCustomEntity> items = [];
+  var directory = Directory(folder.fullPath);
+  late List<FileSystemEntity> entities;
+  try {
+    entities = directory.listSync(recursive: true);
+  } catch (e) {
+    logger.log.e(e);
+    entities = [];
+  }
+
+  items.add(folder);
+  for (var entity in entities) {
+    items.add(FileSystemCustomEntity.fromEntity(entity));
+  }
+
+  return items;
+}
+
 List<FileSystemCustomEntity> getFoldersRecursivly(
   FileSystemCustomEntity folder,
 ) {
@@ -119,6 +140,7 @@ List<FileSystemCustomEntity> getFoldersRecursivly(
     entities = directory.listSync(recursive: true);
   } catch (e) {
     logger.log.e(e);
+    entities = [];
   }
 
   directories.add(folder);

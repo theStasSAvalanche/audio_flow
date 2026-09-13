@@ -48,8 +48,8 @@ class StorageNavigatorBloc
     if (event.dir != '/storage/emulated/0') {
       var parentDirList = directory.path.split(Platform.pathSeparator);
       parentDirList.removeLast();
-      var parentDir = parentDirList.join(Platform.pathSeparator);
-      items.insert(0, FileSystemCustomEntity(name: '..', fullPath: parentDir, isDir: true));
+      items.insert(0, FileSystemCustomEntity(name: '..', fullPath: event.dir, isDir: true));
+      items.first.isChecked = event.isChecked ? true : false;
     }
     
 
