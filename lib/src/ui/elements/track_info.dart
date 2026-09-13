@@ -44,6 +44,7 @@ class TrackInformation extends StatelessWidget {
             children: [
               SizedBox(
                 height: headerHeight,
+                width: headerHeight,
                 child: ColorFiltered(
                   colorFilter: ColorFilter.mode(
                     Theme.of(context).scaffoldBackgroundColor,

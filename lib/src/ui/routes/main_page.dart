@@ -40,7 +40,7 @@ class MainPage extends StatelessWidget {
       'Start building slivers inside custom scrollview on main page route!',
     );
     // final double screenHeight = MediaQuery.sizeOf(context).height;
-    final double headerHeight = MediaQuery.sizeOf(context).height * 0.2;
+    final double headerHeight = MediaQuery.sizeOf(context).height * 0.15;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
