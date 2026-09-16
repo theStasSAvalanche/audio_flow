@@ -56,7 +56,7 @@ class OpenFilesAndFolders extends HookWidget {
             children: [
               Builder(
                 builder: (context) {
-                  if (state is StorageNavigatorLoading) {
+                  if (storageNavigatorBloc.state is StorageNavigatorLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else {
                     return Expanded(

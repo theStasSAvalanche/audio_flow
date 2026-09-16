@@ -50,7 +50,10 @@ class StorageNavigatorBloc
     logger.logNS.d('Items: $items');
 
     // work with '..'
-    if (settings.pathsToScan.contains(event.item)) {
+    if (settings.semiCheckedPaths.contains(event.item)) {
+      event.item.isChecked = null;
+    }
+    else if (settings.pathsToScan.contains(event.item)) {
       event.item.isChecked = true;
     }
     // collect checkboxes values from settings structures
@@ -97,6 +100,8 @@ class StorageNavigatorBloc
     if (item.isChecked == true) {
       isChecked = false;
     }
+    logger.logNS.d('Directory: $item');
+    logger.logNS.d('Is checked = $isChecked');
     try {
       if (items[index].isDir && isChecked) {
         var subDirectories = getFoldersRecursivly(item);
@@ -104,11 +109,14 @@ class StorageNavigatorBloc
         for (var dir in subDirectories) {
           settings.pathsToScan.add(dir);
         }
+        settings.pathsToScan.add(items[index]);
         items[index].isChecked = true;
       } else if (items[index].isDir && !isChecked) {
         setDirectoryContentUncheckedRecursievly(item);
-        settings.uncheckedFiles.add(items[index]);
         items[index].isChecked = false;
+        logger.logNS.d('PAths to scan: ${settings.pathsToScan}');
+        logger.logNS.d('Semichecked: ${settings.semiCheckedPaths}');
+        logger.logNS.d('Unchecked: ${settings.uncheckedFiles}');
       } else if (!items[index].isDir && isChecked) {
         settings.uncheckedFiles.remove(item);
         settings.pathsToScan.add(item);

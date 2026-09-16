@@ -210,11 +210,15 @@ void setDirectoryContentUncheckedRecursievly(FileSystemCustomEntity entity) {
   var directory = Directory(entity.fullPath);
   var entities = directory.listSync(recursive: true, followLinks: false);
   for (var entity in entities) {
-    if (entity is File) {
-      var item = FileSystemCustomEntity.fromEntity(entity);
-      settings.pathsToScan.remove(item);
-      settings.semiCheckedPaths.remove(item);
-      settings.uncheckedFiles.remove(item);
-    }
+    var item = FileSystemCustomEntity.fromEntity(entity);
+    logger.logNS.d(item);
+    logger.logNS.d('item in paths to scan: ${settings.pathsToScan.contains(item)}');
+    settings.pathsToScan.remove(item);
+    settings.semiCheckedPaths.remove(item);
+    settings.uncheckedFiles.remove(item);
   }
+  settings.pathsToScan.remove(entity);
+  settings.semiCheckedPaths.remove(entity);
+  settings.uncheckedFiles.add(entity);
+  logger.log.d(entities);
 }
