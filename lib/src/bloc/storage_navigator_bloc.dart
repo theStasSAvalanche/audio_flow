@@ -49,13 +49,13 @@ class StorageNavigatorBloc
     }
     logger.logNS.d('Items: $items');
 
-    // work with '..'
-    if (settings.semiCheckedPaths.contains(event.item)) {
-      event.item.isChecked = null;
-    }
-    else if (settings.pathsToScan.contains(event.item)) {
-      event.item.isChecked = true;
-    }
+    // // work with '..'
+    // if (settings.semiCheckedPaths.contains(event.item)) {
+    //   event.item.isChecked = null;
+    // }
+    // else if (settings.pathsToScan.contains(event.item)) {
+    //   event.item.isChecked = true;
+    // }
     // collect checkboxes values from settings structures
     for (var thisItem in items) {
       if (settings.uncheckedFiles.contains(thisItem)) {
@@ -79,6 +79,12 @@ class StorageNavigatorBloc
         fullPath: event.item.fullPath,
         isDir: true,
       );
+
+      if (settings.semiCheckedPaths.contains(event.item)) {
+        firstItem.isChecked = null;
+      } else if (settings.pathsToScan.contains(event.item)) {
+        firstItem.isChecked = true;
+      }
       items.insert(0, firstItem);
     }
 
@@ -109,7 +115,16 @@ class StorageNavigatorBloc
         for (var dir in subDirectories) {
           settings.pathsToScan.add(dir);
         }
-        settings.pathsToScan.add(items[index]);
+        if (index != 0) {
+          settings.pathsToScan.add(items[index]);
+        } else {
+          var parentDir = FileSystemCustomEntity(
+            name: items[index].fullPath.split(Platform.pathSeparator).last,
+            fullPath: items[index].fullPath,
+            isDir: true,
+          );
+          settings.pathsToScan.add(parentDir);
+        }
         items[index].isChecked = true;
       } else if (items[index].isDir && !isChecked) {
         setDirectoryContentUncheckedRecursievly(item);
@@ -128,8 +143,7 @@ class StorageNavigatorBloc
         items[index].isChecked = false;
       }
       setParentDirectoriesSemiChecked(item);
-    }
-    catch (e) {
+    } catch (e) {
       logger.log.e(e);
     }
 
