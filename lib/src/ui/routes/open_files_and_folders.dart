@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' show Platform;
 
 import 'package:audio_flow/src/bloc/audio_player_bloc.dart';
 import 'package:audio_flow/src/bloc/bottom_bar_bloc.dart';
@@ -8,8 +8,6 @@ import 'package:audio_flow/src/bloc/storage_navigator_bloc.dart';
 import 'package:audio_flow/src/bloc/theme_bloc.dart';
 import 'package:audio_flow/src/configuration/config.dart' show settings;
 import 'package:audio_flow/src/configuration/logger.dart' show logger;
-import 'package:audio_flow/src/instruments/storage_audio_reader.dart'
-    show getFoldersRecursivly, setParentDirectoriesSemiChecked, getItemsRecursivly;
 import 'package:audio_flow/src/models/filesystem_entity.dart'
     show FileSystemCustomEntity;
 import 'package:audio_flow/src/ui/elements/app_bar.dart' show AudioFlowAppBar;
@@ -43,9 +41,13 @@ class OpenFilesAndFolders extends HookWidget {
     return BlocBuilder<StorageNavigatorBloc, StorageNavigatorState>(
       bloc: storageNavigatorBloc
         ..add(
-          StorageNavigatorScanEvent(
-            dir: settings.currentScanDir,
-            isChecked: false,
+          StorageNavigatorLoadEvent(
+            item: FileSystemCustomEntity(
+              name: 'rootDir',
+              fullPath: settings.localStorage,
+              isDir: true,
+              isChecked: false,
+            ),
           ),
         ),
       builder: (context, state) {
@@ -66,7 +68,9 @@ class OpenFilesAndFolders extends HookWidget {
                           final item = state.items[index];
                           return SystemEntityTile(
                             key: ValueKey(item.fullPath),
+                            items: state.items,
                             entity: item,
+                            index: index,
                             storageNavigatorBloc: storageNavigatorBloc,
                           );
                         },
@@ -83,7 +87,6 @@ class OpenFilesAndFolders extends HookWidget {
                   ElevatedButton(
                     child: const Text('Add'),
                     onPressed: () {
-                      settings.currentScanDir = settings.localStorage;
                       logger.log.d(
                         'Files and folders to scan: ${settings.pathsToScan}',
                       );
@@ -97,7 +100,9 @@ class OpenFilesAndFolders extends HookWidget {
                   ElevatedButton(
                     child: const Text('Cancel'),
                     onPressed: () {
-                      settings.currentScanDir = settings.localStorage;
+                      logger.log.d(
+                        'Loading files cancelled, clear all structures',
+                      );
                       settings.pathsToScan.clear();
                       settings.semiCheckedPaths.clear();
                       settings.uncheckedFiles.clear();
@@ -127,85 +132,29 @@ class OpenFilesAndFolders extends HookWidget {
   }
 }
 
-class SystemEntityTile extends StatefulWidget {
+class SystemEntityTile extends StatelessWidget {
+  final List<FileSystemCustomEntity> items;
   final FileSystemCustomEntity entity;
+  final int index;
   final StorageNavigatorBloc storageNavigatorBloc;
   const SystemEntityTile({
     super.key,
+    required this.items,
     required this.entity,
+    required this.index,
     required this.storageNavigatorBloc,
   });
 
-  @override
-  State<SystemEntityTile> createState() => _SystemEntityTileState();
-}
-
-class _SystemEntityTileState extends State<SystemEntityTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: Checkbox(
         tristate: true,
-        value: widget.entity.isChecked,
+        value: entity.isChecked,
         onChanged: (_) {
-          if (widget.entity.isChecked == null || !widget.entity.isChecked!) {
-            widget.entity.isChecked = true;
-          } else {
-            widget.entity.isChecked = false;
-          }
-
-          if (widget.entity.name == '..') {
-            logger.log.d('Checkbox near .. activated:');
-            logger.log.d('Current dir: ${settings.currentScanDir}');
-            var items = getItemsRecursivly(widget.entity);
-            for (var item in items) {
-              if (item.isDir) {
-                settings.pathsToScan.add(item);
-              }
-              else {
-                settings.uncheckedFiles.remove(item.fullPath);
-              }
-            }
-            widget.storageNavigatorBloc.add(
-              StorageNavigatorScanEvent(
-                dir: settings.currentScanDir,
-                isChecked: widget.entity.isChecked!,
-              ),
-            );
-          }
-
-          if (widget.entity.isChecked! && widget.entity.isDir) {
-            var dirs = getFoldersRecursivly(widget.entity);
-            for (var dir in dirs) {
-              settings.pathsToScan.add(dir);
-              settings.semiCheckedPaths.remove(dir);
-            }
-          } else if (widget.entity.isChecked!) {
-            settings.pathsToScan.add(widget.entity);
-            settings.uncheckedFiles.remove(widget.entity.fullPath);
-            setParentDirectoriesSemiChecked(
-              widget.entity,
-              settings.localStorage,
-            );
-          } else if (!widget.entity.isChecked! && widget.entity.isDir) {
-            var dirs = getFoldersRecursivly(widget.entity);
-            for (var dir in dirs) {
-              settings.pathsToScan.remove(dir);
-            }
-            setParentDirectoriesSemiChecked(
-              widget.entity,
-              settings.localStorage,
-            );
-          } else {
-            settings.pathsToScan.remove(widget.entity);
-            settings.uncheckedFiles.add(widget.entity.fullPath);
-            setParentDirectoriesSemiChecked(
-              widget.entity,
-              settings.localStorage,
-            );
-          }
-
-          setState(() {});
+          storageNavigatorBloc.add(
+            StorageNavigatorCheckEvent(items: items, itemIndex: index),
+          );
         },
       ),
       title: Row(
@@ -213,62 +162,38 @@ class _SystemEntityTileState extends State<SystemEntityTile> {
         crossAxisAlignment: .start,
         children: [
           Icon(
-            widget.entity.isDir
-                ? (widget.entity.name != '..'
+            entity.isDir
+                ? (entity.name != '..'
                       ? Icons.folder_outlined
                       : Icons.arrow_upward)
                 : Icons.audio_file,
           ),
           SizedBox(width: 8),
-          Expanded(child: Text(widget.entity.name)),
+          Expanded(child: Text(entity.name)),
         ],
       ),
       onTap: () {
-        if (widget.entity.name == '..') {
-          var parent = widget.entity.fullPath.split(Platform.pathSeparator)
+        if (entity.isDir && entity.name == '..') {
+          // build parent folder
+          var splitPaths = entity.fullPath.split(Platform.pathSeparator)
             ..removeLast();
-          var parentDir = parent.join(Platform.pathSeparator);
-          settings.currentScanDir = parentDir;
-          widget.storageNavigatorBloc.add(
-            StorageNavigatorScanEvent(dir: parentDir, isChecked: false),
+          var parentDir = splitPaths.join(Platform.pathSeparator);
+          storageNavigatorBloc.add(
+            StorageNavigatorLoadEvent(
+              item: FileSystemCustomEntity(
+                name: splitPaths.last,
+                fullPath: parentDir,
+                isDir: true,
+              ),
+            ),
           );
-          return;
+        } else if (entity.isDir) {
+          storageNavigatorBloc.add(StorageNavigatorLoadEvent(item: entity));
+        } else {
+          storageNavigatorBloc.add(
+            StorageNavigatorCheckEvent(items: items, itemIndex: index),
+          );
         }
-
-        if (!widget.entity.isDir) {
-          logger.log.d('Clicked on file ${widget.entity}');
-          widget.entity.isChecked = !widget.entity.isChecked!;
-          if (widget.entity.isChecked!) {
-            settings.pathsToScan.add(widget.entity);
-            settings.uncheckedFiles.remove(widget.entity.fullPath);
-            setParentDirectoriesSemiChecked(
-              widget.entity,
-              settings.localStorage,
-            );
-          }
-          else {
-            settings.pathsToScan.remove(widget.entity);
-            settings.uncheckedFiles.add(widget.entity.fullPath);
-            setParentDirectoriesSemiChecked(
-              widget.entity,
-              settings.localStorage,
-            );
-          }
-          logger.logNS.d('set state after clicked on file');
-          setState(() {});
-          return;
-        }
-
-        var nextDir =
-            '${settings.currentScanDir}${Platform.pathSeparator}${widget.entity.name}';
-        settings.currentScanDir = nextDir;
-        logger.log.d('Next scan dir: $nextDir');
-        widget.storageNavigatorBloc.add(
-          StorageNavigatorScanEvent(
-            dir: nextDir,
-            isChecked: widget.entity.isChecked ?? false,
-          ),
-        );
       },
     );
   }

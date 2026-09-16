@@ -20,10 +20,10 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(
       .toList();
   var defaultAlbumDir = await getDirectoryAlbumPicture(audioDir);
   for (var entity in entities) {
-    if (entity is File && settings.uncheckedFiles.contains(entity.path)) {
+    if (entity is File && settings.uncheckedFiles.contains(FileSystemCustomEntity.fromEntity(entity))) {
       continue;
     }
-    
+
     if (entity is File && checkEntityIsAudio(entity.path)) {
       try {
         var audioFile = AudioFlowFile.fromMetadata(
@@ -109,9 +109,7 @@ bool checkEntityIsAudio(String entity) {
   return entity.endsWith('.mp3') || entity.endsWith('.flac');
 }
 
-List<FileSystemCustomEntity> getItemsRecursivly(
-  FileSystemCustomEntity folder,
-) {
+List<FileSystemCustomEntity> getItemsRecursivly(FileSystemCustomEntity folder) {
   List<FileSystemCustomEntity> items = [];
   var directory = Directory(folder.fullPath);
   late List<FileSystemEntity> entities;
@@ -153,25 +151,23 @@ List<FileSystemCustomEntity> getFoldersRecursivly(
   return directories;
 }
 
-void setParentDirectoriesSemiChecked(
-  FileSystemCustomEntity entity,
-  String rootDir,
-) {
-  var items = entity.fullPath.split(Platform.pathSeparator);
-  items.removeLast();
-  var item = items.join(Platform.pathSeparator);
-  while (item != rootDir) {
-    var dir = Directory(item);
-    var customItem = FileSystemCustomEntity.fromEntity(dir);
-    settings.semiCheckedPaths.add(customItem);
-    items.removeLast();
-    item = items.join(Platform.pathSeparator);
+void setParentDirectoriesSemiChecked(FileSystemCustomEntity item) {
+  logger.log.d('Start semicheck parents of $item');
+  var paths = item.fullPath.split(Platform.pathSeparator);
+  paths.removeLast();
+  var parent = paths.join(Platform.pathSeparator);
+  while (parent != settings.localStorage || parent != settings.externalStorage) {
+    var customparent = FileSystemCustomEntity(name: paths.last, fullPath: parent, isDir: true);
+    logger.logNS.d('Path to semicheck: $customparent');
+    settings.semiCheckedPaths.add(customparent);
+    // settings.pathsToScan.remove(customparent);
+    paths.removeLast();
+    parent = paths.join(Platform.pathSeparator);
   }
+  logger.logNS.d('Semi checked paths: ${settings.semiCheckedPaths}');
 }
 
-Future<String?> getDirectoryAlbumPicture(
-  Directory directory,
-) async {
+Future<String?> getDirectoryAlbumPicture(Directory directory) async {
   logger.log.d('Get image from folder ${directory.toString()}');
   var imageExtensionsSet = {'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'};
 
@@ -195,4 +191,22 @@ Future<String?> getDirectoryAlbumPicture(
 
   logger.log.d('In directory ${directory.toString()} images not found.');
   return null;
+}
+
+void setDirectoryContentUncheckedRecursievly(FileSystemCustomEntity entity) {
+  if (!entity.isDir) {
+    logger.log.w('setDirectoryContentUnchecked not works with files: $entity');
+    return;
+  }
+
+  var directory = Directory(entity.fullPath);
+  var entities = directory.listSync(recursive: true, followLinks: false);
+  for (var entity in entities) {
+    if (entity is File) {
+      var item = FileSystemCustomEntity.fromEntity(entity);
+      settings.pathsToScan.remove(item);
+      settings.semiCheckedPaths.remove(item);
+      settings.uncheckedFiles.remove(item);
+    }
+  }
 }

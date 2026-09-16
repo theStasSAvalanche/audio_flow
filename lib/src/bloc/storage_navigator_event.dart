@@ -2,11 +2,18 @@ part of 'storage_navigator_bloc.dart';
 
 @immutable
 sealed class StorageNavigatorEvent {
-  final String dir;
-  final bool isChecked;
-  const StorageNavigatorEvent({required this.dir, required this.isChecked});
+  const StorageNavigatorEvent();
 }
 
-class StorageNavigatorScanEvent extends StorageNavigatorEvent {
-  const StorageNavigatorScanEvent({required super.dir, required super.isChecked});
+
+class StorageNavigatorLoadEvent extends StorageNavigatorEvent {
+  final FileSystemCustomEntity item;
+  const StorageNavigatorLoadEvent({required this.item});
+}
+
+
+class StorageNavigatorCheckEvent extends StorageNavigatorEvent {
+  final List<FileSystemCustomEntity> items;
+  final int itemIndex;
+  const StorageNavigatorCheckEvent({required this.items, required this.itemIndex});
 }

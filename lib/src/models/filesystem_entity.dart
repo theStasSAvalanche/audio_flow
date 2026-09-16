@@ -4,14 +4,20 @@ class FileSystemCustomEntity {
   final String name;
   final String fullPath;
   final bool isDir;
-  bool? isChecked = false;
+  bool? isChecked;
 
-  FileSystemCustomEntity({required this.name, required this.fullPath, required this.isDir});
+  FileSystemCustomEntity({
+    required this.name,
+    required this.fullPath,
+    required this.isDir,
+    this.isChecked = false,
+  });
 
-  FileSystemCustomEntity.fromEntity(FileSystemEntity entity) :
-    name = entity.path.split(Platform.pathSeparator).last,
-    fullPath = entity.path,
-    isDir = entity is Directory;
+  FileSystemCustomEntity.fromEntity(FileSystemEntity entity)
+    : name = entity.path.split(Platform.pathSeparator).last,
+      fullPath = entity.path,
+      isDir = entity is Directory,
+      isChecked = false;
 
   @override
   String toString() {
@@ -27,7 +33,6 @@ class FileSystemCustomEntity {
     if (identical(this, other)) return true;
 
     // 2. Check if the other object is of the same type and has the same field values
-    return other is FileSystemCustomEntity &&
-        other.fullPath == fullPath;
+    return other is FileSystemCustomEntity && other.fullPath == fullPath;
   }
 }

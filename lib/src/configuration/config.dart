@@ -49,9 +49,9 @@ class Settings {
   List<AudioFlowFile> audioPlaylist = [];
   Set<FileSystemCustomEntity> pathsToScan = {};
   Set<FileSystemCustomEntity> semiCheckedPaths = {};
-  Set<String> uncheckedFiles = {};
+  Set<FileSystemCustomEntity> uncheckedFiles = {};
   String localStorage = '/storage/emulated/0';
-  String currentScanDir = '/storage/emulated/0';
+  String externalStorage = '/storage/emulated/0'; // TODO: fix to external storage
 
   static final Settings _instance = Settings._internal();
 
