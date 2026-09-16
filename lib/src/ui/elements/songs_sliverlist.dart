@@ -122,10 +122,24 @@ class SongTile extends StatelessWidget {
         return previous != current;
       },
       builder: (context, state) {
+        var subtitle = '';
+        if (song.artist != null) {
+          subtitle = song.artist!;
+        }
+        if (song.album != null) {
+          subtitle = '$subtitle - ${song.album!}';
+        }
         return ListTile(
           key: tileKey,
           title: Text('${index + 1}. ${song.title}'),
-          subtitle: Text('${song.artist} - ${song.album}'),
+          subtitle: Row(
+            mainAxisAlignment: .spaceBetween,
+            crossAxisAlignment: .center,
+            children: [
+              Flexible(child: Text(subtitle)),
+              Text(song.duration != null ? song.duration!.split('.').first : ''),
+            ],
+          ),
           selectedTileColor: Colors.lightBlue.withValues(alpha: 0.3),
           selected: song == state.audioTrack,
           shape: RoundedRectangleBorder(

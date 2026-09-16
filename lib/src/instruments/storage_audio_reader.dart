@@ -15,12 +15,15 @@ Future<SplayTreeMap<String, List<AudioFlowFile>>> getAudioContentFromFolder(
   final audioDatabase = SplayTreeMap<String, List<AudioFlowFile>>();
   final Directory audioDir = Directory(folder);
 
-  List<FileSystemEntity> entities = await audioDir
-      .list(recursive: false, followLinks: false)
-      .toList();
+  List<FileSystemEntity> entities =
+      await audioDir.list(recursive: false, followLinks: false).toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
   var defaultAlbumDir = await getDirectoryAlbumPicture(audioDir);
   for (var entity in entities) {
-    if (entity is File && settings.uncheckedFiles.contains(FileSystemCustomEntity.fromEntity(entity))) {
+    if (entity is File &&
+        settings.uncheckedFiles.contains(
+          FileSystemCustomEntity.fromEntity(entity),
+        )) {
       continue;
     }
 
@@ -156,8 +159,13 @@ void setParentDirectoriesSemiChecked(FileSystemCustomEntity item) {
   var paths = item.fullPath.split(Platform.pathSeparator);
   paths.removeLast();
   var parent = paths.join(Platform.pathSeparator);
-  while (parent != settings.localStorage || parent != settings.externalStorage) {
-    var customparent = FileSystemCustomEntity(name: paths.last, fullPath: parent, isDir: true);
+  while (parent != settings.localStorage ||
+      parent != settings.externalStorage) {
+    var customparent = FileSystemCustomEntity(
+      name: paths.last,
+      fullPath: parent,
+      isDir: true,
+    );
     logger.logNS.d('Path to semicheck: $customparent');
     settings.semiCheckedPaths.add(customparent);
     // settings.pathsToScan.remove(customparent);

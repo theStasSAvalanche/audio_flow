@@ -44,7 +44,7 @@ Future<void> savePlaylistToHive(
   }
 
   for (var key in audioDatabase.keys) {
-    audioDatabase[key]!.sort((a, b) => a.compareTo(b));
+    // audioDatabase[key]!.sort((a, b) => a.compareTo(b));
     // for (var file in audioDatabase[key]!) {
     //   logger.logNS.i(file.toString());
     // }
