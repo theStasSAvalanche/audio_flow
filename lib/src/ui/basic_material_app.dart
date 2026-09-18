@@ -21,22 +21,13 @@ import 'package:audio_flow/src/ui/elements/left_drawer.dart'
 import 'package:permission_handler/permission_handler.dart';
 
 class AudioFlowApp extends StatelessWidget {
-  const AudioFlowApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AudioFlowMaterial();
-  }
-}
-
-class AudioFlowMaterial extends StatelessWidget {
-  const AudioFlowMaterial({super.key});
+  final AudioPlayerBloc audioPlayerBloc;
+  const AudioFlowApp({super.key, required this.audioPlayerBloc});
 
   @override
   Widget build(BuildContext context) {
     logger.log.d('Start building MaterialApp widget');
     final themeBloc = ThemeBloc();
-    final audioPlayerBloc = AudioPlayerBloc();
     final bottomBarBloc = BottomBarBloc();
     final playlistFilesBloc = PlaylistFilesBloc();
     final playlistNameBloc = PlaylistNameBloc();

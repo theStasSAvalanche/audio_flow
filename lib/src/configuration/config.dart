@@ -1,24 +1,17 @@
 import 'package:audio_flow/src/models/audio_flow_file.dart' show AudioFlowFile;
-import 'package:audio_flow/src/models/filesystem_entity.dart' show FileSystemCustomEntity;
-import 'package:audio_session/audio_session.dart' show AndroidAudioAttributes, AndroidAudioContentType, AndroidAudioFocusGainType, AndroidAudioUsage, AudioSession, AudioSessionConfiguration, AVAudioSessionCategory;
+import 'package:audio_flow/src/models/filesystem_entity.dart'
+    show FileSystemCustomEntity;
+import 'package:audio_session/audio_session.dart'
+    show AndroidAudioAttributes, AndroidAudioContentType, AndroidAudioFocusGainType, AndroidAudioUsage, AudioSession, AudioSessionConfiguration, AVAudioSessionCategory, AudioInterruptionType;
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:logger/logger.dart' show Level;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 
+enum AudioStatus { initial, playing, paused }
 
-enum AudioStatus {
-  initial,
-  playing,
-  paused,
-}
-
-enum RepeatStatus {
-  off,
-  all,
-  one,
-}
+enum RepeatStatus { off, all, one }
 
 class Settings {
   // make settings persistent
@@ -37,7 +30,9 @@ class Settings {
   var logFileName = _prefs.getString('logFileName') ?? 'app_log.txt';
 
   // Application settings
-  ThemeMode themeMode = _prefs.getString('themeMode') == 'dark' ? ThemeMode.dark : ThemeMode.light;
+  ThemeMode themeMode = _prefs.getString('themeMode') == 'dark'
+      ? ThemeMode.dark
+      : ThemeMode.light;
   AudioStatus playerStatus = AudioStatus.initial;
   var currentTrackNumber = _prefs.getInt('currentTrackNumber') ?? -1;
   var isRandom = _prefs.getBool('isRandom') ?? false;
@@ -51,7 +46,8 @@ class Settings {
   Set<FileSystemCustomEntity> semiCheckedPaths = {};
   Set<FileSystemCustomEntity> uncheckedFiles = {};
   String localStorage = '/storage/emulated/0';
-  String externalStorage = '/storage/emulated/0'; // TODO: fix to external storage
+  String externalStorage =
+      '/storage/emulated/0'; // TODO: fix to external storage
 
   static final Settings _instance = Settings._internal();
 
@@ -71,16 +67,45 @@ class Settings {
 
   Future<AudioSession> initAudioSession() async {
     final session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration(
-      androidAudioAttributes: AndroidAudioAttributes(
-      contentType: AndroidAudioContentType.music,
-      usage: AndroidAudioUsage.media,
+    await session.configure(
+      const AudioSessionConfiguration(
+        androidAudioAttributes: AndroidAudioAttributes(
+          contentType: AndroidAudioContentType.music,
+          usage: AndroidAudioUsage.media,
+        ),
+        androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+        avAudioSessionCategory: AVAudioSessionCategory.playback,
       ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      avAudioSessionCategory: AVAudioSessionCategory.playback
-    ));
+    );
 
     return session;
+  }
+
+  void configureAudioSession(AudioSession session) {
+    session.interruptionEventStream.listen((event) {
+      if (event.begin) {
+        switch (event.type) {
+          case AudioInterruptionType.duck:
+            // Another app started playing audio and we should duck.
+            break;
+          case AudioInterruptionType.pause:
+          case AudioInterruptionType.unknown:
+            // Another app started playing audio and we should pause.
+            break;
+        }
+      } else {
+        switch (event.type) {
+          case AudioInterruptionType.duck:
+            // The interruption ended and we should unduck.
+            break;
+          case AudioInterruptionType.pause:
+          // The interruption ended and we should resume.
+          case AudioInterruptionType.unknown:
+            // The interruption ended but we should not resume.
+            break;
+        }
+      }
+    });
   }
 
   Future<void> initSoloud() async {
